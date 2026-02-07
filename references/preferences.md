@@ -26,6 +26,11 @@ This file tracks learned preferences from user feedback to improve article selec
 - Technical deep-dives with economic context
 - Policy implications of technology
 
+### Source Diversity (IMPORTANT)
+- **Always prefer 3 different sources** for deep-dive articles
+- Only pick 2 from same source if other options are clearly inferior
+- Variety of perspectives matters as much as topic quality
+
 ### Less Preferred
 - Celebrity/personality-focused stories
 - Pure product reviews
@@ -44,6 +49,10 @@ This file tracks learned preferences from user feedback to improve article selec
 - Avoid flat, monotone delivery
 
 ## Feedback History
+
+### 2026-02-07
+- Issue: Picked 2 articles from same source (FT) - should always aim for 3 different sources
+- Emphasized: Source diversity is as important as topic quality
 
 ### 2026-02-05
 - Liked: Musk/SpaceX + xAI merger, Google AI spending, chip market analysis

@@ -148,15 +148,13 @@ async function extractHeadlines(): Promise<NewsHeadlines[]> {
       // The Guardian
       if (url.includes("theguardian.com/uk")) {
         const articles = await page.evaluate(() => {
-          const containers = Array.from(document.querySelectorAll('[data-link-name="article"]'));
-          return containers
-            .map((container) => {
-              const link = container.querySelector('a');
-              return {
-                headline: container.textContent?.trim().replace(/\s+/g, " ") || '',
-                url: link ? (link as HTMLAnchorElement).href : ''
-              };
-            })
+          // The [data-link-name="article"] elements ARE the <a> tags
+          const links = Array.from(document.querySelectorAll('a[data-link-name="article"]'));
+          return links
+            .map((link) => ({
+              headline: link.textContent?.trim().replace(/\s+/g, " ") || '',
+              url: (link as HTMLAnchorElement).href
+            }))
             .filter((item) => item.headline && item.url && item.headline.length > 20 && item.headline.length < 200)
             .slice(0, 5);
         });
