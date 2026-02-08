@@ -50,6 +50,11 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ## Feedback History
 
+### 2026-02-08
+- **Critical issue**: Reused 2 out of 3 articles from previous briefing (Economist dollar article, FT tech crash article)
+- **Must check article-history.json** before selecting to avoid repeating articles from past 7 days
+- TTS pronunciation issue: "2026" was read as "2020... 26" - use spelled-out format "twenty twenty-six" instead
+
 ### 2026-02-07
 - Issue: Picked 2 articles from same source (FT) - should always aim for 3 different sources
 - Emphasized: Source diversity is as important as topic quality

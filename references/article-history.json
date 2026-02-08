@@ -1,0 +1,20 @@
+{
+  "articles": [
+    {
+      "url": "https://www.economist.com/finance-and-economics/2026/02/05/why-the-dollar-may-have-much-further-to-fall",
+      "headline": "Why the dollar may have much further to fall",
+      "date": "2026-02-08"
+    },
+    {
+      "url": "https://www.ft.com/content/df69f37b-0929-45d0-b357-5db7ed5c2678",
+      "headline": "Tech wreck signals a market reset",
+      "date": "2026-02-08"
+    },
+    {
+      "url": "https://www.theverge.com/tech/874721/epstein-thiel-musk-trump-metoo",
+      "headline": "How the men in the Epstein files defeated #MeToo",
+      "date": "2026-02-08"
+    }
+  ],
+  "last_updated": "2026-02-08T11:15:00.000Z"
+}

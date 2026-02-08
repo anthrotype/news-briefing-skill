@@ -14,8 +14,8 @@ Generate personalized daily audio news briefings by fetching headlines from 5 ma
 Run the headlines script to get current top stories with URLs from all 5 news sources:
 
 ```bash
-cd /home/lupocos/projects/oss/dev-browser/skills/dev-browser && \
-npx tsx /home/claude/.claude/skills/news-briefing/scripts/get-news-with-urls.ts 2>/dev/null
+cd /home/lupocos/projects/oss/news-briefing-skill && \
+npx tsx scripts/get-news-with-urls.ts 2>/dev/null
 ```
 
 This returns JSON with headlines and article URLs from:
@@ -28,6 +28,16 @@ This returns JSON with headlines and article URLs from:
 ### 2. Check Preferences
 
 Read `references/preferences.md` to understand learned topic interests and article selection patterns. Use this to inform your choices in the next step.
+
+### 2.5. Check Article History
+
+Read `references/article-history.json` to see which articles were covered in the past 7 days. **Do NOT re-select articles that appear in this file.**
+
+```bash
+cat /home/claude/.claude/skills/news-briefing/references/article-history.json
+```
+
+The file contains an array of recently used articles with their URLs, headlines, and dates. Ensure your selections are fresh.
 
 ### 3. Select Articles
 
@@ -42,6 +52,23 @@ Autonomously select 3 articles that:
 - Medium priority: UK/international politics, financial markets, infrastructure
 - Lower priority: Consumer product reviews, celebrity news, pure entertainment
 
+### 3.5. Update Article History
+
+After selecting your 3 articles, **immediately update** `references/article-history.json` to record them. This prevents re-using the same articles in future briefings.
+
+```bash
+cd /home/claude/.claude/skills/news-briefing && \
+node scripts/update-article-history.js \
+  "ARTICLE_1_URL" "ARTICLE_1_HEADLINE" \
+  "ARTICLE_2_URL" "ARTICLE_2_HEADLINE" \
+  "ARTICLE_3_URL" "ARTICLE_3_HEADLINE"
+```
+
+**Important:** Replace the URLs and headlines with your actual selections. The script automatically:
+- Adds the 3 articles with today's date
+- Prunes articles older than 7 days
+- Updates the timestamp
+
 ### 4. Scrape Articles
 
 For each selected article, scrape the full content using the remote Chrome connection:
@@ -52,14 +79,14 @@ scrape-remote "https://www.economist.com/..." > /tmp/article2.md
 scrape-remote "https://www.theverge.com/..." > /tmp/article3.md
 ```
 
-The `scrape-remote` script uses dev-browser's remote Chrome session to bypass paywalls with the user's credentials.
+The `scrape-remote` script uses the remote Chrome session (CDP on port 9223) to bypass paywalls with the user's credentials.
 
 ### 5. Write Podcast Script
 
 Create a podcast script with this structure:
 
 **Intro: Headlines Roundup (2-3 minutes)**
-- Brief opening greeting with date
+- Brief opening greeting with date (format as "February eighth, twenty twenty-six" to avoid TTS stumbling on "2026")
 - Quick scan of ALL major headlines across the 5 sources
 - Cover politics, economics, business, tech - paint the full picture
 - End with transition to the 3 deep-dive articles
@@ -137,7 +164,7 @@ When feedback is received, update `references/preferences.md` immediately:
 ## Resources
 
 ### scripts/get-news-with-urls.ts
-TypeScript script that connects to dev-browser, refreshes all 5 news tabs, and extracts headlines with article URLs. Returns JSON array with structure:
+TypeScript script that connects to remote Chrome via CDP (port 9223), refreshes all 5 news tabs, and extracts headlines with article URLs. Returns JSON array with structure:
 ```json
 [
   {
@@ -162,3 +189,20 @@ Learned preferences from user feedback. Updated after each briefing based on use
 - Feedback history with dates
 
 Read this file at the start of each briefing to inform article selection.
+
+### references/article-history.json
+Tracks articles used in the past 7 days to prevent repetition. Structure:
+```json
+{
+  "articles": [
+    {
+      "url": "https://www.ft.com/content/...",
+      "headline": "Article title",
+      "date": "2026-02-08"
+    }
+  ],
+  "last_updated": "2026-02-08T10:26:00.000Z"
+}
+```
+
+**CRITICAL:** Always check this file before selecting articles and update it immediately after selection. Articles older than 7 days are automatically pruned.
