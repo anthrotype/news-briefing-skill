@@ -1,11 +1,17 @@
 ---
 name: news-briefing
-description: Generate daily audio news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute audio summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge).
+description: Generate daily news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge). Supports both audio (via TTS) and text-only modes.
+args: "[--text-only]"
 ---
 
 # News Briefing
 
-Generate personalized daily audio news briefings by fetching headlines from 5 major news sources, selecting 3 compelling articles, and creating a podcast-style summary delivered via WhatsApp voice message.
+Generate personalized daily news briefings by fetching headlines from 5 major news sources, selecting 3 compelling articles, and creating a podcast-style summary delivered via WhatsApp.
+
+## Usage
+
+- **Audio mode (default)**: `/news-briefing` - Generates audio via ElevenLabs TTS and sends as WhatsApp voice message
+- **Text-only mode**: `/news-briefing --text-only` - Saves transcript to file and sends file link (no TTS cost)
 
 ## Workflow
 
@@ -117,7 +123,9 @@ Create a podcast script with this structure:
 - Include specific numbers and names (adds credibility)
 - Build narrative tension: setup → development → implication
 
-### 6. Send Audio
+### 6. Deliver Briefing
+
+#### Audio Mode (Default)
 
 Use the `speak` MCP tool to convert the script to audio and send via WhatsApp:
 
@@ -128,6 +136,32 @@ mcp__whatsapp-agent-tools__speak({
 ```
 
 **Important:** Use the speak MCP tool, NOT direct ElevenLabs API calls. The speak tool uses the preferred default voice.
+
+#### Text-Only Mode
+
+If the user requested `--text-only`, save the script to a file instead of generating audio:
+
+```bash
+# Create transcript file with timestamp
+TIMESTAMP=$(date +%Y%m%d-%H%M)
+TRANSCRIPT_FILE="/home/lupocos/projects/static/news-briefing-${TIMESTAMP}.txt"
+
+cat > "$TRANSCRIPT_FILE" << 'EOF'
+News Briefing - [Date]
+======================
+
+[Your full podcast script here...]
+
+EOF
+
+# Make it readable via Tailscale
+chmod 644 "$TRANSCRIPT_FILE"
+
+# Share the URL
+echo "Transcript available at: https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/news-briefing-${TIMESTAMP}.txt"
+```
+
+Alternatively, for shorter scripts, you can just send the text directly in the WhatsApp message.
 
 ### 7. Capture Feedback
 
@@ -144,6 +178,12 @@ When feedback is received, update `references/preferences.md` immediately:
 
 ## Tips
 
+**Mode selection:**
+- Use text-only mode to save on ElevenLabs TTS costs (audio generation is expensive)
+- Audio mode is best when user explicitly wants to listen while multitasking
+- Text-only is faster to generate and easier to skim/search
+- Consider text-only as default unless user specifically requests audio
+
 **Article selection:**
 - Scan ALL headlines before deciding - don't just pick the first 3 interesting ones
 - Look for stories with broader implications, not isolated events
@@ -155,8 +195,9 @@ When feedback is received, update `references/preferences.md` immediately:
 - Deep-dive articles should feel like storytelling, not summaries
 - Use transition phrases between sections: "Speaking of...", "Meanwhile...", "This ties into..."
 - End each article with "why this matters" - connect to bigger trends
+- Write in podcast style even for text-only mode (conversational, engaging)
 
-**Voice delivery:**
+**Voice delivery (audio mode only):**
 - Keep script under 1,800 words to stay within 15-minute limit
 - Short paragraphs = natural pauses for the TTS voice
 - Avoid parentheticals - they sound awkward in audio
