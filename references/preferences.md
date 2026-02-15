@@ -8,6 +8,9 @@ This file tracks learned preferences from user feedback to improve article selec
 - AI and technology industry dynamics
 - Tech business strategy and economics
 - AI safety, policy, and regulation
+- **Technology's impact on society and culture** (and feedback loops)
+- **Fintech** and financial services technology
+- UK financial services and institutions
 
 ### Medium Priority
 - UK and international politics
@@ -15,8 +18,9 @@ This file tracks learned preferences from user feedback to improve article selec
 - Tech infrastructure and tools
 
 ### Lower Priority
-- Consumer tech products
+- Consumer tech products (unless broader societal/cultural implications)
 - Entertainment and media
+- **Internal US politics** (unless broader international impact, especially UK/Italy)
 
 ## Article Selection Patterns
 
@@ -25,15 +29,17 @@ This file tracks learned preferences from user feedback to improve article selec
 - Business strategy and industry dynamics
 - Technical deep-dives with economic context
 - Policy implications of technology
+- International stories (UK, Europe, global implications)
+- Avoid internal US politics unless clear international impact
 
 ### Source Diversity (IMPORTANT)
 - **Always prefer 3 different sources** for deep-dive articles
 - Only pick 2 from same source if other options are clearly inferior
 - Variety of perspectives matters as much as topic quality
 
-### Less Preferred
+### Avoid
+- **Product reviews** (consumer tech reviews, gadget launches, etc.)
 - Celebrity/personality-focused stories
-- Pure product reviews
 - Short breaking news without analysis
 
 ## Coverage Balance Preferences
@@ -58,6 +64,14 @@ This file tracks learned preferences from user feedback to improve article selec
 ### 2026-02-07
 - Issue: Picked 2 articles from same source (FT) - should always aim for 3 different sources
 - Emphasized: Source diversity is as important as topic quality
+
+### 2026-02-13
+- **First article (DOJ/Gail Slater antitrust) not very interesting** - internal US politics
+- **Second and third articles were good**: NS&I (fintech interest + premium bonds holder) and Ring (owns Ring doorbell)
+- Preference: Skip internal US political stories unless they have broader international repercussions
+- Especially interested in connections to UK or Italian politics
+- Interested in fintech and UK financial services (NS&I premium bonds customer)
+- Voice: Adam Stone (ElevenLabs) worked well
 
 ### 2026-02-05
 - Liked: Musk/SpaceX + xAI merger, Google AI spending, chip market analysis

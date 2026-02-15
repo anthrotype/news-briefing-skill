@@ -1,16 +1,21 @@
 ---
 name: news-briefing
 description: Generate daily news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge). Supports both audio (via TTS) and text-only modes.
-args: "[--text-only]"
+args: "[--text-only] [--whatsapp] [--voice aoede|aoede-pro|adam-stone|chris-brift|archer]"
 ---
 
 # News Briefing
 
-Generate personalized daily news briefings by fetching headlines from 5 major news sources, selecting 3 compelling articles, and creating a podcast-style summary delivered via WhatsApp.
+Generate personalized daily news briefings by fetching headlines from 5 major news sources, selecting 3 compelling articles, and creating a podcast-style summary.
 
 ## Usage
 
-- **Audio mode (default)**: `/news-briefing` - Generates audio via ElevenLabs TTS and sends as WhatsApp voice message
+- **Podcast mode (default)**: `/news-briefing` - Generates MP3 via ElevenLabs Chris Brift voice, publishes to private podcast feed
+- **Voice choice**: `/news-briefing --voice aoede-pro` - Uses Gemini Pro model (2x cost, richer expressivity)
+- **Voice choice**: `/news-briefing --voice adam-stone` - Uses ElevenLabs Adam Stone voice instead (1.2x, pricier)
+- **Voice choice**: `/news-briefing --voice chris-brift` - Uses ElevenLabs Chris Brift voice
+- **Voice choice**: `/news-briefing --voice archer` - Uses ElevenLabs Archer voice (younger editorial)
+- **WhatsApp mode**: `/news-briefing --whatsapp` - Sends as WhatsApp voice message (legacy behavior)
 - **Text-only mode**: `/news-briefing --text-only` - Saves transcript to file and sends file link (no TTS cost)
 
 ## Workflow
@@ -87,6 +92,30 @@ scrape-remote "https://www.theverge.com/..." > /tmp/article3.md
 
 The `scrape-remote` script uses the remote Chrome session (CDP on port 9223) to bypass paywalls with the user's credentials.
 
+**Retry on failure:** If `scrape-remote` fails or returns empty/bot-challenge content (very short output, "just a moment", "verifying you are human"), restart the remote browser and retry:
+
+```bash
+remote-chrome-restart
+sleep 5
+scrape-remote "https://..." > /tmp/article1.md
+```
+
+**Snapshot fallback:** If `scrape-remote` still fails after retry (especially for interactive/JS-heavy pages like Economist `/interactive/` articles), use the accessibility tree scraper:
+
+```bash
+scrape-snapshot "https://..." > /tmp/article1.md
+```
+
+This uses `agent-browser` to render the page and extract text from the accessibility tree. The output may contain chart labels and data annotations mixed in with article text — that's OK, the LLM will handle cleanup when writing the podcast script. For particularly noisy output, you can also capture a PDF for visual reference:
+
+```bash
+agent-browser pdf /tmp/article1-layout.pdf
+```
+
+Then read the PDF yourself to understand the article's visual layout and distinguish body text from chart noise.
+
+If an article still fails after all fallbacks, skip it and pick an alternative from the headlines list. Do not block the entire briefing on one failed scrape.
+
 ### 5. Write Podcast Script
 
 Create a podcast script with this structure:
@@ -125,43 +154,95 @@ Create a podcast script with this structure:
 
 ### 6. Deliver Briefing
 
-#### Audio Mode (Default)
+#### Podcast Mode (Default)
 
-Use the `speak` MCP tool to convert the script to audio and send via WhatsApp:
+Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent and can run as a background task.
+
+1. **Save the script** to a temp file (**no style preamble needed** — the preset handles it):
+
+```bash
+cat > /tmp/briefing-script.txt << 'SCRIPT'
+[Full podcast script here — just the content, no style instructions]
+SCRIPT
+```
+
+2. **Generate the MP3** using `podcast-tts` and **capture the cost**:
+
+```bash
+# Default: Aoede preset (Gemini, British newsreader, cheap)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice aoede < /tmp/briefing-script.txt)
+
+# Adam Stone preset (ElevenLabs, smooth/deep, 1.2x speed, pricier)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice adam-stone < /tmp/briefing-script.txt)
+```
+
+Pass through the `--voice` flag from the user's args. Default is `aoede` if not specified.
+
+The script prints a `COST:$X.XXXX` line to stdout. Extract it: `TTS_COST=$(echo "$TTS_OUTPUT" | grep '^COST:' | cut -d: -f2)`. Include this cost in the notification message to the user.
+
+3. **Publish to the podcast feed** (with show notes linking to transcript):
+
+```bash
+TITLE="News Briefing - $(date +'%B %-d, %Y')"
+DESCRIPTION="AI-curated daily news briefing: [brief summary of the 3 articles covered]"
+
+# Save transcript to static/articles/ (linked from show notes, not inlined in feed XML)
+ARTICLES_DIR="/home/lupocos/projects/static/articles"
+mkdir -p "$ARTICLES_DIR"
+SLUG="news-briefing-$(date +%Y-%m-%d)"
+cp /tmp/briefing-script.txt "$ARTICLES_DIR/${SLUG}.md"
+chmod 644 "$ARTICLES_DIR/${SLUG}.md"
+TRANSCRIPT_URL="https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/articles/${SLUG}.md"
+
+# Create lightweight show notes with link
+cat > /tmp/briefing-shownotes.md << EOF
+## $TITLE
+
+[Read full transcript]($TRANSCRIPT_URL)
+EOF
+
+podcast-add-episode /tmp/briefing-episode.mp3 "$TITLE" "$DESCRIPTION" --notes /tmp/briefing-shownotes.md
+rm -f /tmp/briefing-shownotes.md
+```
+
+Show notes contain a link to the full transcript (hosted in `static/articles/`), keeping the feed XML lightweight. Articles older than 7 days are cleaned up automatically by the `read-article` script.
+
+4. **Notify the user**: Send a WhatsApp message tagging `@Cosimo` (for push notification) confirming the episode is published. Include the episode title, a one-line summary, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see it in Apple Podcasts automatically.
+
+**Voice presets**: Default is `chris-brift` (ElevenLabs). Pass `--voice` from the user's args through to `podcast-tts`.
+
+#### WhatsApp Mode (--whatsapp)
+
+If the user passed `--whatsapp`, use the `speak` MCP tool instead to send as a voice message:
 
 ```typescript
 mcp__whatsapp-agent-tools__speak({
-  text: "Full podcast script here..."
+  text: "Read this in a natural, engaging British newsreader style:\n\n[Full podcast script here...]",
+  engine: "gemini",
+  voiceId: "Aoede"
 })
 ```
 
-**Important:** Use the speak MCP tool, NOT direct ElevenLabs API calls. The speak tool uses the preferred default voice.
+#### Text-Only Mode (--text-only)
 
-#### Text-Only Mode
-
-If the user requested `--text-only`, save the script to a file instead of generating audio:
+Save the script to `static/articles/` and share the URL:
 
 ```bash
-# Create transcript file with timestamp
-TIMESTAMP=$(date +%Y%m%d-%H%M)
-TRANSCRIPT_FILE="/home/lupocos/projects/static/news-briefing-${TIMESTAMP}.txt"
+ARTICLES_DIR="/home/lupocos/projects/static/articles"
+mkdir -p "$ARTICLES_DIR"
+SLUG="news-briefing-$(date +%Y-%m-%d)"
+TRANSCRIPT_FILE="$ARTICLES_DIR/${SLUG}.md"
 
 cat > "$TRANSCRIPT_FILE" << 'EOF'
-News Briefing - [Date]
-======================
+# News Briefing - [Date]
 
 [Your full podcast script here...]
 
 EOF
 
-# Make it readable via Tailscale
 chmod 644 "$TRANSCRIPT_FILE"
-
-# Share the URL
-echo "Transcript available at: https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/news-briefing-${TIMESTAMP}.txt"
+echo "Transcript available at: https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/articles/${SLUG}.md"
 ```
-
-Alternatively, for shorter scripts, you can just send the text directly in the WhatsApp message.
 
 ### 7. Capture Feedback
 
@@ -179,10 +260,10 @@ When feedback is received, update `references/preferences.md` immediately:
 ## Tips
 
 **Mode selection:**
-- Use text-only mode to save on ElevenLabs TTS costs (audio generation is expensive)
-- Audio mode is best when user explicitly wants to listen while multitasking
-- Text-only is faster to generate and easier to skim/search
-- Consider text-only as default unless user specifically requests audio
+- Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale
+- Use `--whatsapp` for immediate voice message delivery (e.g. when user wants it NOW)
+- Use `--text-only` to skip TTS entirely (fastest, no cost)
+- The `--voice` flag controls TTS: `chris-brift` (ElevenLabs, default), `archer` (younger editorial), `adam-stone` (deeper), or `aoede` (Gemini, free)
 
 **Article selection:**
 - Scan ALL headlines before deciding - don't just pick the first 3 interesting ones
@@ -197,7 +278,12 @@ When feedback is received, update `references/preferences.md` immediately:
 - End each article with "why this matters" - connect to bigger trends
 - Write in podcast style even for text-only mode (conversational, engaging)
 
-**Voice delivery (audio mode only):**
+**Voice delivery (podcast/whatsapp modes):**
+- `--voice aoede` (default): Gemini Flash, female British newsreader, cheap
+- `--voice aoede-pro`: Gemini Pro, female British newsreader, 2x cost, richer expressivity
+- `--voice adam-stone`: ElevenLabs, smooth/deep male, 1.2x speed, pricier
+- `--voice chris-brift`: ElevenLabs, Chris Brift, 1.1x speed
+- `--voice archer`: ElevenLabs, Archer (younger editorial tone)
 - Keep script under 1,800 words to stay within 15-minute limit
 - Short paragraphs = natural pauses for the TTS voice
 - Avoid parentheticals - they sound awkward in audio
