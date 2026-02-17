@@ -207,7 +207,7 @@ rm -f /tmp/briefing-shownotes.md
 
 Show notes contain a link to the full transcript (hosted in `static/articles/`), keeping the feed XML lightweight. Articles older than 7 days are cleaned up automatically by the `read-article` script.
 
-4. **Notify the user**: Send a WhatsApp message tagging `@Cosimo` (for push notification) confirming the episode is published. Include the episode title, a one-line summary, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see it in Apple Podcasts automatically.
+4. **Notify the user**: Send a plain WhatsApp **text** message (not a voice message) tagging `@Cosimo` (for push notification) confirming the episode is published. Include the episode title, a one-line summary, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see it in Apple Podcasts automatically.
 
 **Voice presets**: Default is `chris-brift` (ElevenLabs). Pass `--voice` from the user's args through to `podcast-tts`.
 

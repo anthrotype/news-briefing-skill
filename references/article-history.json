@@ -1,36 +1,6 @@
 {
   "articles": [
     {
-      "url": "https://www.economist.com/finance-and-economics/2026/02/05/why-the-dollar-may-have-much-further-to-fall",
-      "headline": "Why the dollar may have much further to fall",
-      "date": "2026-02-08"
-    },
-    {
-      "url": "https://www.ft.com/content/df69f37b-0929-45d0-b357-5db7ed5c2678",
-      "headline": "Tech wreck signals a market reset",
-      "date": "2026-02-08"
-    },
-    {
-      "url": "https://www.theverge.com/tech/874721/epstein-thiel-musk-trump-metoo",
-      "headline": "How the men in the Epstein files defeated #MeToo",
-      "date": "2026-02-08"
-    },
-    {
-      "url": "https://www.economist.com/finance-and-economics/2026/02/08/how-to-hedge-a-bubble-ai-edition",
-      "headline": "How to hedge a bubble, AI edition",
-      "date": "2026-02-09"
-    },
-    {
-      "url": "https://www.ft.com/content/f1f95f01-bd05-4a92-9222-4ddd3d356bb1",
-      "headline": "'They want their pound of flesh': bank bosses push strict return-to-office mandates",
-      "date": "2026-02-09"
-    },
-    {
-      "url": "https://www.theverge.com/policy/875300/section-230-turns-30-social-media-addiction-cases-sunset",
-      "headline": "Section 230 turns 30 as it faces its biggest tests yet",
-      "date": "2026-02-09"
-    },
-    {
       "url": "https://www.economist.com/business/2026/02/09/china-once-stole-foreign-ideas-now-it-wants-to-protect-its-own",
       "headline": "China once stole foreign ideas. Now it wants to protect its own",
       "date": "2026-02-10"
@@ -104,7 +74,52 @@
       "url": "https://www.ft.com/content/9c7542d4-1b2b-4062-b53d-bb02b5f12851",
       "headline": "Ukraine's no man's land is the future of war",
       "date": "2026-02-14"
+    },
+    {
+      "url": "https://www.theverge.com/ai-artificial-intelligence/877931/bytedance-seedance-2-video-generator-ai-launch",
+      "headline": "ByteDance's next-gen AI model can generate clips based on text, images, audio, and video",
+      "date": "2026-02-15"
+    },
+    {
+      "url": "https://www.ft.com/content/62b8713f-cd72-4838-b8ac-708b91b2830f",
+      "headline": "Six Wall Street bank chiefs bring in combined pay of $250mn in 2025",
+      "date": "2026-02-15"
+    },
+    {
+      "url": "https://www.economist.com/europe/2026/02/14/america-offers-europe-warmer-words-but-a-deep-chill-remains",
+      "headline": "America offers Europe warmer words, but a deep chill remains",
+      "date": "2026-02-15"
+    },
+    {
+      "url": "https://www.ft.com/content/c30ded60-bece-45e0-981d-653e1e3e9818",
+      "headline": "KPMG partner fined over using AI to pass AI test",
+      "date": "2026-02-16"
+    },
+    {
+      "url": "https://www.economist.com/finance-and-economics/2026/02/15/donald-trumps-schemes-to-juice-the-economy",
+      "headline": "Donald Trump's schemes to juice the economy",
+      "date": "2026-02-16"
+    },
+    {
+      "url": "https://www.ft.com/content/dbd1d803-ab37-43f1-920f-fce74952313a",
+      "headline": "Russia's Wagner Group pivots to European sabotage, say western officials",
+      "date": "2026-02-16"
+    },
+    {
+      "url": "https://www.theguardian.com/business/2026/feb/16/uk-bank-bosses-plan-visa-mastercard-alternative",
+      "headline": "UK bank bosses plan to set up Visa and Mastercard alternative amid Trump fears",
+      "date": "2026-02-17"
+    },
+    {
+      "url": "https://www.economist.com/by-invitation/2026/02/16/russias-economy-has-entered-the-death-zone",
+      "headline": "Russia's economy has entered the death zone",
+      "date": "2026-02-17"
+    },
+    {
+      "url": "https://www.ft.com/content/5c6df36a-50c6-4832-8def-0aa351b17647",
+      "headline": "Why Rubio failed to repair the transatlantic rift",
+      "date": "2026-02-17"
     }
   ],
-  "last_updated": "2026-02-14T09:55:57.939Z"
+  "last_updated": "2026-02-17T08:29:57.063Z"
 }
