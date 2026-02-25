@@ -180,19 +180,24 @@ Pass through the `--voice` flag from the user's args. Default is `aoede` if not 
 
 The script prints a `COST:$X.XXXX` line to stdout. Extract it: `TTS_COST=$(echo "$TTS_OUTPUT" | grep '^COST:' | cut -d: -f2)`. Include this cost in the notification message to the user.
 
-3. **Publish to the podcast feed** (with show notes linking to transcript):
+3. **Publish to the podcast feed** (with show notes linking to transcript + native SRT transcript):
 
 ```bash
 TITLE="News Briefing - $(date +'%B %-d, %Y')"
 DESCRIPTION="AI-curated daily news briefing: [brief summary of the 3 articles covered]"
 
-# Save transcript to static/articles/ (linked from show notes, not inlined in feed XML)
+# Save formatted script to static/articles/ (linked from show notes)
 ARTICLES_DIR="/home/lupocos/projects/static/articles"
 mkdir -p "$ARTICLES_DIR"
 SLUG="news-briefing-$(date +%Y-%m-%d)"
 cp /tmp/briefing-script.txt "$ARTICLES_DIR/${SLUG}.md"
 chmod 644 "$ARTICLES_DIR/${SLUG}.md"
 TRANSCRIPT_URL="https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/articles/${SLUG}.md"
+
+# Generate timestamped SRT transcript via Groq Whisper (~4s for 15min audio at 200x realtime)
+# This is the most reliable way to get accurate word-level timing for AntennaPod sync.
+groq-transcribe /tmp/briefing-episode.mp3 /tmp/briefing-groq-transcript.md 2>&1 | grep -v "^$"
+# (The .md output is discarded; we use our formatted script for show notes instead)
 
 # Create lightweight show notes with link
 cat > /tmp/briefing-shownotes.md << EOF
@@ -201,13 +206,15 @@ cat > /tmp/briefing-shownotes.md << EOF
 [Read full transcript]($TRANSCRIPT_URL)
 EOF
 
-podcast-add-episode /tmp/briefing-episode.mp3 "$TITLE" "$DESCRIPTION" --notes /tmp/briefing-shownotes.md
+podcast-add-episode /tmp/briefing-episode.mp3 "$TITLE" "$DESCRIPTION" \
+    --notes /tmp/briefing-shownotes.md \
+    --transcript /tmp/briefing-groq-transcript.srt
 rm -f /tmp/briefing-shownotes.md
 ```
 
-Show notes contain a link to the full transcript (hosted in `static/articles/`), keeping the feed XML lightweight. Articles older than 7 days are cleaned up automatically by the `read-article` script.
+Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
 
-4. **Notify the user**: Send a plain WhatsApp **text** message (not a voice message) tagging `@Cosimo` (for push notification) confirming the episode is published. Include the episode title, a one-line summary, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see it in Apple Podcasts automatically.
+4. **Notify the user**: Post a **plain text message in the current chat** (do NOT use `speak`, do NOT use `send_message_to_workspace` — both waste credits). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically.
 
 **Voice presets**: Default is `chris-brift` (ElevenLabs). Pass `--voice` from the user's args through to `podcast-tts`.
 
