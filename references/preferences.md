@@ -50,7 +50,7 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ## Voice Preferences
 
-- Use default speak MCP tool voice (not Rachel/ElevenLabs API direct)
+- **Always use Aoede voice** (Gemini Flash, British newsreader) — user explicitly prefers this
 - Conversational, engaging tone
 - Avoid flat, monotone delivery
 
@@ -72,6 +72,9 @@ This file tracks learned preferences from user feedback to improve article selec
 - Especially interested in connections to UK or Italian politics
 - Interested in fintech and UK financial services (NS&I premium bonds customer)
 - Voice: Adam Stone (ElevenLabs) worked well
+
+### 2026-02-25
+- Voice: Always use Aoede (explicitly stated preference)
 
 ### 2026-02-05
 - Liked: Musk/SpaceX + xAI merger, Google AI spending, chip market analysis
