@@ -76,6 +76,11 @@ This file tracks learned preferences from user feedback to improve article selec
 ### 2026-02-25
 - Voice: Always use Aoede (explicitly stated preference)
 
+### 2026-03-01
+- **Praised dedicating an entire episode to a single historical event** (US-Israel war on Iran, Khamenei killed)
+- When a genuinely historic, fast-moving story dominates all sources, it's better to go deep on that story from multiple angles than to force topic diversity
+- Structure: headlines roundup covers the full breadth, deep-dives provide complementary angles on the same event (power vacuum, regional spread, geopolitical context)
+
 ### 2026-02-05
 - Liked: Musk/SpaceX + xAI merger, Google AI spending, chip market analysis
 - All three AI-infrastructure focused articles worked well

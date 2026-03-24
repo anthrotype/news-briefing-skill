@@ -20,6 +20,16 @@ Generate personalized daily news briefings by fetching headlines from 5 major ne
 
 ## Workflow
 
+### 0. Confirm Today's Date
+
+**Always check the actual London date/time before writing anything** — the system prompt date can be stale by a day or more:
+
+```bash
+TZ=Europe/London date '+%A, %B %-d, %Y'
+```
+
+Use this output as the authoritative date throughout the briefing (episode title, podcast script greeting, etc). Do not rely on the system prompt's `currentDate`.
+
 ### 1. Fetch Headlines
 
 Run the headlines script to get current top stories with URLs from all 5 news sources:
@@ -118,31 +128,52 @@ If an article still fails after all fallbacks, skip it and pick an alternative f
 
 ### 5. Write Podcast Script
 
-Create a podcast script with this structure:
+**Before writing: decide on article order.**
+
+Article selection is driven by quality and variety first — the editorial doesn't constrain what you pick. Once you have your 3 articles, decide which one most invites commentary: the one with the sharpest implication, the most interesting tension, or the most provocative angle. Place that article last, just before the editorial. The other two go first in whatever order feels natural.
+
+If two or more articles happen to share a genuine thread — a tension, a paradox, an underlying logic — you can build the editorial around that connection. But this is a bonus when it emerges naturally, not something to engineer. The default is: one article, one good take.
+
+Create a podcast script with this structure, using `---` on its own line to separate sections:
 
 **Intro: Headlines Roundup (2-3 minutes)**
 - Brief opening greeting with date (format as "February eighth, twenty twenty-six" to avoid TTS stumbling on "2026")
 - Quick scan of ALL major headlines across the 5 sources
 - Cover politics, economics, business, tech - paint the full picture
-- End with transition to the 3 deep-dive articles
+- End with a preview of the 3 deep-dive articles **in the order you've chosen** (match the ordering below)
 
-**Article 1 (3-4 minutes)**
+---
+
+**Article 1 (3-4 minutes)** — standalone or loosely connected
 - Context and background
 - Key facts and developments
 - Analysis and implications
-- Keep it conversational and engaging
 
-**Article 2 (3-4 minutes)**
+---
+
+**Article 2 (3-4 minutes)** — standalone or loosely connected
 - Same structure as Article 1
 
-**Article 3 (3-4 minutes)**
+---
+
+**Article 3 (3-4 minutes)** — the one most worthy of editorial commentary (placed last)
 - Same structure as Article 1
+- End with a natural transition toward the editorial: a question, a tension, or an observation that sets up your take
 
-**Outro (30 seconds)**
-- Brief summary tying themes together
-- Closing statement
+---
 
-**Total length: 10-15 minutes** (aim for ~1,300-1,800 words at 130-150 words/minute)
+**Editorial (2 minutes)**
+- **No label, no announcement.** Don't say "Editorial", "Opinion", "And now for my take" or anything like that. Just continue naturally from the last article, as a radio presenter would — a new paragraph, a pivot in tone, and your thoughts begin. The listener will feel the shift without being told about it.
+- Baseline: a genuine take on the last article — its deeper implication, an angle the reporting didn't fully develop, a contradiction it exposes
+- Bonus: if a thread runs through two or more of today's articles, develop that — but only when it's genuinely there, not constructed
+- Avoid mere summary. This is your analysis, your interpretation — a point of view, not a recap
+- Close with a single sentence that lands: something memorable, not a formula
+
+---
+
+*(No separate outro needed — the editorial closes the episode.)*
+
+**Total length: 12-17 minutes** (aim for ~1,600-2,100 words at 130-150 words/minute)
 
 **Writing style:**
 - Conversational, not stiff or formal
@@ -210,6 +241,11 @@ podcast-add-episode /tmp/briefing-episode.mp3 "$TITLE" "$DESCRIPTION" \
     --notes /tmp/briefing-shownotes.md \
     --transcript /tmp/briefing-groq-transcript.srt
 rm -f /tmp/briefing-shownotes.md
+
+# Clean up all temp files from this run (IMPORTANT: prevents stale files from confusing future sessions)
+rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
+      /tmp/briefing-groq-transcript.md /tmp/briefing-groq-transcript.srt \
+      /tmp/article1.md /tmp/article2.md /tmp/article3.md
 ```
 
 Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
@@ -284,6 +320,9 @@ When feedback is received, update `references/preferences.md` immediately:
 - Use transition phrases between sections: "Speaking of...", "Meanwhile...", "This ties into..."
 - End each article with "why this matters" - connect to bigger trends
 - Write in podcast style even for text-only mode (conversational, engaging)
+- **Article ordering**: place the article most worthy of editorial commentary last; order the other two naturally
+- **Editorial**: take a genuine position on the last article. If a thread connects multiple articles, develop it — but variety in article selection comes first and the editorial adapts, not the other way around. Have a view.
+- **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph
 
 **Voice delivery (podcast/whatsapp modes):**
 - `--voice aoede` (default): Gemini Flash, female British newsreader, cheap
@@ -291,7 +330,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - `--voice adam-stone`: ElevenLabs, smooth/deep male, 1.2x speed, pricier
 - `--voice chris-brift`: ElevenLabs, Chris Brift, 1.1x speed
 - `--voice archer`: ElevenLabs, Archer (younger editorial tone)
-- Keep script under 1,800 words to stay within 15-minute limit
+- Keep script under 2,100 words to stay within 17-minute limit (the editorial adds ~300 words)
 - Short paragraphs = natural pauses for the TTS voice
 - Avoid parentheticals - they sound awkward in audio
 
