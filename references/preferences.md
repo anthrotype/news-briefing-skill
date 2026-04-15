@@ -50,7 +50,7 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ## Voice Preferences
 
-- **Always use Aoede voice** (Gemini Flash, British newsreader) — user explicitly prefers this
+- **Always use Qwen Jason Palmer voice** (`qwen-jason-palmer`, free local Mac Studio) — user explicitly prefers this
 - Conversational, engaging tone
 - Avoid flat, monotone delivery
 
@@ -80,6 +80,9 @@ This file tracks learned preferences from user feedback to improve article selec
 - **Praised dedicating an entire episode to a single historical event** (US-Israel war on Iran, Khamenei killed)
 - When a genuinely historic, fast-moving story dominates all sources, it's better to go deep on that story from multiple angles than to force topic diversity
 - Structure: headlines roundup covers the full breadth, deep-dives provide complementary angles on the same event (power vacuum, regional spread, geopolitical context)
+
+### 2026-04-06
+- Voice: Switch to Qwen Jason Palmer (`qwen-jason-palmer`) — free local Mac Studio voice, now preferred over Aoede
 
 ### 2026-02-05
 - Liked: Musk/SpaceX + xAI merger, Google AI spending, chip market analysis

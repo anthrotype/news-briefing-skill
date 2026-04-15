@@ -50,12 +50,24 @@ async function ensureTabsOpen(browser: any): Promise<void> {
     const existingPage = pagesBySite.get(site.name);
 
     if (existingPage) {
-      console.error(`Refreshing ${site.name}...`);
-      try {
-        await existingPage.reload({ waitUntil: "domcontentloaded", timeout: 30000 });
-        await existingPage.waitForTimeout(2000);
-      } catch (err) {
-        console.error(`  Warning: Failed to refresh ${site.name}, continuing anyway`);
+      const currentUrl = existingPage.url();
+      const isOnHomepage = currentUrl === site.url || currentUrl === site.url + "/";
+      if (isOnHomepage) {
+        console.error(`Refreshing ${site.name}...`);
+        try {
+          await existingPage.reload({ waitUntil: "domcontentloaded", timeout: 30000 });
+          await existingPage.waitForTimeout(2000);
+        } catch (err) {
+          console.error(`  Warning: Failed to refresh ${site.name}, continuing anyway`);
+        }
+      } else {
+        console.error(`Navigating ${site.name} back to homepage (was: ${currentUrl})...`);
+        try {
+          await existingPage.goto(site.url, { waitUntil: "domcontentloaded", timeout: 30000 });
+          await existingPage.waitForTimeout(2000);
+        } catch (err) {
+          console.error(`  Warning: Failed to navigate ${site.name}, continuing anyway`);
+        }
       }
     } else {
       console.error(`Opening ${site.name}...`);
@@ -70,12 +82,14 @@ async function ensureTabsOpen(browser: any): Promise<void> {
 }
 
 async function extractHeadlines(): Promise<NewsHeadlines[]> {
-  const browser = await chromium.connectOverCDP("http://localhost:9223");
+  const cdpPort = process.env.CDP_PORT || "9224";
+  const browser = await chromium.connectOverCDP(`http://localhost:${cdpPort}`);
 
   await ensureTabsOpen(browser);
 
   const contexts = browser.contexts();
   const results: NewsHeadlines[] = [];
+  const seenSites = new Set<string>();
 
   for (const context of contexts) {
     for (const page of context.pages()) {
@@ -112,22 +126,29 @@ async function extractHeadlines(): Promise<NewsHeadlines[]> {
 
           return stories;
         });
-        results.push({ site: "The Verge", pageUrl: url, articles });
+        if (!seenSites.has("The Verge")) {
+          seenSites.add("The Verge");
+          results.push({ site: "The Verge", pageUrl: url, articles });
+        }
       }
 
-      // The Economist
+      // The Economist — only process if on the homepage (avoids article tabs)
       if (url.includes("economist.com") && !url.includes("push-worker")) {
-        const articles = await page.evaluate(() => {
-          const links = Array.from(document.querySelectorAll('a[data-analytics*="headline"]'));
-          return links
-            .map((a) => ({
-              headline: a.innerText?.trim() || '',
-              url: (a as HTMLAnchorElement).href
-            }))
-            .filter((item) => item.headline && item.headline.length > 15)
-            .slice(0, 5);
-        });
-        results.push({ site: "The Economist", pageUrl: url, articles });
+        const isHomepage = url === "https://www.economist.com" || url === "https://www.economist.com/";
+        if (!seenSites.has("The Economist") && isHomepage) {
+          const articles = await page.evaluate(() => {
+            const links = Array.from(document.querySelectorAll('a[data-analytics*="headline"]'));
+            return links
+              .map((a) => ({
+                headline: a.innerText?.trim() || '',
+                url: (a as HTMLAnchorElement).href
+              }))
+              .filter((item) => item.headline && item.headline.length > 15)
+              .slice(0, 5);
+          });
+          seenSites.add("The Economist");
+          results.push({ site: "The Economist", pageUrl: url, articles });
+        }
       }
 
       // Financial Times
@@ -142,7 +163,10 @@ async function extractHeadlines(): Promise<NewsHeadlines[]> {
             .filter((item) => item.headline && item.headline.length > 20 && item.headline.length < 200 && !item.headline.includes("\n"))
             .slice(0, 5);
         });
-        results.push({ site: "Financial Times", pageUrl: url, articles });
+        if (!seenSites.has("Financial Times")) {
+          seenSites.add("Financial Times");
+          results.push({ site: "Financial Times", pageUrl: url, articles });
+        }
       }
 
       // The Guardian
@@ -158,7 +182,10 @@ async function extractHeadlines(): Promise<NewsHeadlines[]> {
             .filter((item) => item.headline && item.url && item.headline.length > 20 && item.headline.length < 200)
             .slice(0, 5);
         });
-        results.push({ site: "The Guardian", pageUrl: url, articles });
+        if (!seenSites.has("The Guardian")) {
+          seenSites.add("The Guardian");
+          results.push({ site: "The Guardian", pageUrl: url, articles });
+        }
       }
 
       // New York Times
@@ -177,7 +204,10 @@ async function extractHeadlines(): Promise<NewsHeadlines[]> {
             .filter((item) => item.headline && item.headline.length > 20 && item.headline.length < 200 && !item.headline.includes("\n"))
             .slice(0, 5);
         });
-        results.push({ site: "New York Times", pageUrl: url, articles });
+        if (!seenSites.has("New York Times")) {
+          seenSites.add("New York Times");
+          results.push({ site: "New York Times", pageUrl: url, articles });
+        }
       }
     }
   }

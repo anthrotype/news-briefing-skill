@@ -1,7 +1,7 @@
 ---
 name: news-briefing
 description: Generate daily news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge). Supports both audio (via TTS) and text-only modes.
-args: "[--text-only] [--whatsapp] [--voice aoede|aoede-pro|adam-stone|chris-brift|archer]"
+args: "[--text-only] [--whatsapp] [--voice aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift]"
 ---
 
 # News Briefing
@@ -10,11 +10,15 @@ Generate personalized daily news briefings by fetching headlines from 5 major ne
 
 ## Usage
 
-- **Podcast mode (default)**: `/news-briefing` - Generates MP3 via ElevenLabs Chris Brift voice, publishes to private podcast feed
+- **Podcast mode (default)**: `/news-briefing` - Generates MP3 via Qwen3-TTS cloned Jason Palmer voice (free, local), publishes to private podcast feed
 - **Voice choice**: `/news-briefing --voice aoede-pro` - Uses Gemini Pro model (2x cost, richer expressivity)
 - **Voice choice**: `/news-briefing --voice adam-stone` - Uses ElevenLabs Adam Stone voice instead (1.2x, pricier)
 - **Voice choice**: `/news-briefing --voice chris-brift` - Uses ElevenLabs Chris Brift voice
 - **Voice choice**: `/news-briefing --voice archer` - Uses ElevenLabs Archer voice (younger editorial)
+- **Voice choice**: `/news-briefing --voice emma` - Kokoro bf_emma, British female (free, local Mac Studio)
+- **Voice choice**: `/news-briefing --voice daniel` - Kokoro bf_daniel, British male (free, local Mac Studio)
+- **Voice choice**: `/news-briefing --voice kokoro-aoede` - Kokoro af_aoede, American female (free, local Mac Studio)
+- **Voice choice**: `/news-briefing --voice qwen-chris-brift` - Qwen3-TTS cloned Chris Brift voice (free, local Mac Studio)
 - **WhatsApp mode**: `/news-briefing --whatsapp` - Sends as WhatsApp voice message (legacy behavior)
 - **Text-only mode**: `/news-briefing --text-only` - Saves transcript to file and sends file link (no TTS cost)
 
@@ -100,12 +104,12 @@ scrape-remote "https://www.economist.com/..." > /tmp/article2.md
 scrape-remote "https://www.theverge.com/..." > /tmp/article3.md
 ```
 
-The `scrape-remote` script uses the remote Chrome session (CDP on port 9223) to bypass paywalls with the user's credentials.
+The `scrape-remote` script uses the remote Chrome session (CDP on port **9224**, Mac Studio Chrome Beta) to bypass paywalls with the user's credentials. Port 9223 is the Crostini legacy fallback — do not use it unless Mac Studio is unreachable.
 
-**Retry on failure:** If `scrape-remote` fails or returns empty/bot-challenge content (very short output, "just a moment", "verifying you are human"), restart the remote browser and retry:
+**Retry on failure:** If `scrape-remote` fails or returns empty/bot-challenge content (very short output, "just a moment", "verifying you are human"), restart the **Mac Studio** browser and retry:
 
 ```bash
-remote-chrome-restart
+mac-chrome-restart
 sleep 5
 scrape-remote "https://..." > /tmp/article1.md
 ```
@@ -207,7 +211,7 @@ TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice aoede < /tmp/briefing
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice adam-stone < /tmp/briefing-script.txt)
 ```
 
-Pass through the `--voice` flag from the user's args. Default is `aoede` if not specified.
+Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
 
 The script prints a `COST:$X.XXXX` line to stdout. Extract it: `TTS_COST=$(echo "$TTS_OUTPUT" | grep '^COST:' | cut -d: -f2)`. Include this cost in the notification message to the user.
 
@@ -252,7 +256,7 @@ Show notes contain a link to the formatted script (hosted in `static/articles/`)
 
 4. **Notify the user**: Post a **plain text message in the current chat** (do NOT use `speak`, do NOT use `send_message_to_workspace` — both waste credits). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically.
 
-**Voice presets**: Default is `chris-brift` (ElevenLabs). Pass `--voice` from the user's args through to `podcast-tts`.
+**Voice presets**: Default is `qwen-jason-palmer` (Qwen3-TTS clone, free local). Pass `--voice` from the user's args through to `podcast-tts`.
 
 #### WhatsApp Mode (--whatsapp)
 
@@ -325,11 +329,17 @@ When feedback is received, update `references/preferences.md` immediately:
 - **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph
 
 **Voice delivery (podcast/whatsapp modes):**
-- `--voice aoede` (default): Gemini Flash, female British newsreader, cheap
+- `--voice qwen-jason-palmer` (default): Qwen3-TTS cloned Jason Palmer voice (free, local Mac Studio)
+- `--voice aoede`: Gemini Flash, female British newsreader, cheap
 - `--voice aoede-pro`: Gemini Pro, female British newsreader, 2x cost, richer expressivity
 - `--voice adam-stone`: ElevenLabs, smooth/deep male, 1.2x speed, pricier
 - `--voice chris-brift`: ElevenLabs, Chris Brift, 1.1x speed
 - `--voice archer`: ElevenLabs, Archer (younger editorial tone)
+- `--voice emma`: Kokoro bf_emma, British female (free, local Mac Studio)
+- `--voice daniel`: Kokoro bf_daniel, British male (free, local Mac Studio)
+- `--voice kokoro-aoede`: Kokoro af_aoede, American female (free, local Mac Studio)
+- `--voice qwen-newsreader`: Qwen3-TTS, British RP male, instructed voice design (free, local Mac Studio)
+- `--voice qwen-chris-brift`: Qwen3-TTS, cloned Chris Brift voice (free, local Mac Studio)
 - Keep script under 2,100 words to stay within 17-minute limit (the editorial adds ~300 words)
 - Short paragraphs = natural pauses for the TTS voice
 - Avoid parentheticals - they sound awkward in audio
@@ -337,7 +347,7 @@ When feedback is received, update `references/preferences.md` immediately:
 ## Resources
 
 ### scripts/get-news-with-urls.ts
-TypeScript script that connects to remote Chrome via CDP (port 9223), refreshes all 5 news tabs, and extracts headlines with article URLs. Returns JSON array with structure:
+TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio Chrome Beta), refreshes all 5 news tabs, and extracts headlines with article URLs. Returns JSON array with structure:
 ```json
 [
   {
