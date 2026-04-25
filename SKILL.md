@@ -204,14 +204,23 @@ SCRIPT
 2. **Generate the MP3** using `podcast-tts` and **capture the cost**:
 
 ```bash
-# Default: Aoede preset (Gemini, British newsreader, cheap)
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice aoede < /tmp/briefing-script.txt)
-
-# Adam Stone preset (ElevenLabs, smooth/deep, 1.2x speed, pricier)
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice adam-stone < /tmp/briefing-script.txt)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer < /tmp/briefing-script.txt)
 ```
 
 Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
+
+The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk | eta ~8m`. **Watch this output** to detect problems early:
+
+- **Normal speed** (qwen-jason-palmer): ~8-12s per chunk. If the first few chunks land in that range, let it run.
+- **Stuck**: if no `done in ...` line appears for >2 minutes after a `Generating chunk X/Y...` line, the oMLX server is likely stuck on that chunk.
+
+**If TTS generation gets stuck:**
+1. Kill the `podcast-tts` process
+2. Retry with `--restart-omlx`, which unconditionally restarts oMLX and waits for it to be ready before sending the first chunk:
+
+```bash
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer --restart-omlx < /tmp/briefing-script.txt)
+```
 
 The script prints a `COST:$X.XXXX` line to stdout. Extract it: `TTS_COST=$(echo "$TTS_OUTPUT" | grep '^COST:' | cut -d: -f2)`. Include this cost in the notification message to the user.
 
