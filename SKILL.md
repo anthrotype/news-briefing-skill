@@ -40,15 +40,22 @@ Run the headlines script to get current top stories with URLs from all 5 news so
 
 ```bash
 cd /home/lupocos/projects/oss/news-briefing-skill && \
-npx tsx scripts/get-news-with-urls.ts 2>/dev/null
+npx tsx scripts/get-news-with-urls.ts 2>/dev/null | \
+node /home/claude/.claude/skills/news-briefing/scripts/save-and-diff-headlines.js
 ```
 
-This returns JSON with headlines and article URLs from:
+This returns annotated JSON with headlines and article URLs from:
 - The Economist (politics, economics, international affairs)
 - Financial Times (business, finance, economics)
 - The Verge (technology, AI, consumer tech)
 - The Guardian (UK/world politics, social issues)
 - New York Times International (world news, US politics)
+
+Each article has an `isNew` field (`true`/`false`) indicating whether its URL appeared in the previous day's fetch. The script also saves the current headlines to `references/last-headlines.json` for tomorrow's diff. On the very first run (no history yet), all articles are marked `isNew: true`.
+
+**Important:** `isNew` is a mechanical URL-match — use it as a first filter, not the final word. Apply your own reasoning on top:
+- A `isNew: true` article can still cover a story you already reported yesterday (e.g. a follow-up with a new URL on the same tariff threat or the same assassination attempt). Check whether the substance is genuinely different before including it.
+- A `isNew: false` article could have been updated with significantly new information. If it's a major developing story with a clear new angle, it may still be worth mentioning.
 
 ### 2. Check Preferences
 
@@ -71,6 +78,7 @@ Autonomously select 3 articles that:
 - Offer substantive analysis over breaking news
 - Span different topics when possible (avoid 3 articles on same story)
 - Come from different sources when possible (prefer variety)
+- **Prefer `isNew: true` articles** — articles marked `isNew: false` were already in yesterday's fetch and should only be picked if they are clearly the best available option and represent a major ongoing story
 
 **Selection criteria:**
 - High priority: AI industry dynamics, tech business strategy, economic policy
@@ -142,8 +150,10 @@ Create a podcast script with this structure, using `---` on its own line to sepa
 
 **Intro: Headlines Roundup (2-3 minutes)**
 - Brief opening greeting with date (format as "February eighth, twenty twenty-six" to avoid TTS stumbling on "2026")
-- Quick scan of ALL major headlines across the 5 sources
-- Cover politics, economics, business, tech - paint the full picture
+- Scan headlines across the 5 sources, using `isNew: true` as a starting signal for freshness — but apply your own judgement too: a `isNew: true` article can still be a follow-up on yesterday's story (same substance, new URL), and a `isNew: false` article may have a genuinely new angle worth mentioning
+- Skip or omit headlines that cover ground already reported yesterday — whether `isNew: false` by URL or a `isNew: true` follow-up on the same story. If a headline is stale and has no new angle, leave it out entirely
+- On slow news days (weekends, holidays) where many headlines repeat, it's fine to have a shorter roundup — fewer but fresher stories beats padding with yesterday's news
+- Cover politics, economics, business, tech from the fresh headlines — paint the full picture of what's actually new today
 - End with a preview of the 3 deep-dive articles **in the order you've chosen** (match the ordering below)
 
 ---

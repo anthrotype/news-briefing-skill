@@ -1,0 +1,132 @@
+[
+  {
+    "site": "New York Times",
+    "pageUrl": "https://www.nytimes.com/international/",
+    "articles": [
+      {
+        "headline": "Officials Are Investigating Writing Tied to Correspondents’ Dinner Attack",
+        "url": "https://www.nytimes.com/2026/04/26/us/politics/white-house-dinner-shooting-suspect-writings.html"
+      },
+      {
+        "headline": "‘Shots Fired!’: Inside the Pandemonium at the Washington Hilton",
+        "url": "https://www.nytimes.com/2026/04/26/us/politics/shots-fired-inside-the-pandemonium-at-the-washington-hilton.html"
+      },
+      {
+        "headline": "Rumors and Speculation Swirl Online After Shooting",
+        "url": "https://www.nytimes.com/2026/04/26/technology/white-house-correspondents-dinner-shooting-conspiracy-theories.html"
+      },
+      {
+        "headline": "Security at Dinner Worked as Intended, Experts Say",
+        "url": "https://www.nytimes.com/2026/04/26/us/politics/security-correspondents-dinner.html"
+      },
+      {
+        "headline": "Generals Running Iran",
+        "url": "https://www.nytimes.com/2026/04/23/world/middleeast/iran-new-leadership-generals.html"
+      }
+    ]
+  },
+  {
+    "site": "The Economist",
+    "pageUrl": "https://www.economist.com/",
+    "articles": [
+      {
+        "headline": "Will Kevin Warsh Trumpify the Federal Reserve?",
+        "url": "https://www.economist.com/finance-and-economics/2026/04/26/will-kevin-warsh-trumpify-the-federal-reserve"
+      },
+      {
+        "headline": "San Francisco, AI capital of the world, is an economic laggard",
+        "url": "https://www.economist.com/finance-and-economics/2026/04/26/san-francisco-ai-capital-of-the-world-is-an-economic-laggard"
+      },
+      {
+        "headline": "Making India’s numbers count again",
+        "url": "https://www.economist.com/asia/2026/04/26/making-indias-numbers-count-again"
+      },
+      {
+        "headline": "Chinamaxxing is starting to catch on, in China",
+        "url": "https://www.economist.com/finance-and-economics/2026/04/23/chinamaxxing-is-starting-to-catch-on-in-china"
+      },
+      {
+        "headline": "Has the World Bank performed a U-turn on industrial policy?",
+        "url": "https://www.economist.com/finance-and-economics/2026/04/23/has-the-world-bank-performed-a-u-turn-on-industrial-policy"
+      }
+    ]
+  },
+  {
+    "site": "The Guardian",
+    "pageUrl": "https://www.theguardian.com/uk",
+    "articles": [
+      {
+        "headline": "Rival Labour factions understood to be discussing how to remove Keir Starmer as leader",
+        "url": "https://www.theguardian.com/politics/2026/apr/26/keir-starmer-vows-lead-labour-general-election-mandelson-vetting"
+      },
+      {
+        "headline": "The Cage review – an astonishing, deeply moving state-of-the-nation thriller",
+        "url": "https://www.theguardian.com/tv-and-radio/2026/apr/26/the-cage-review-bbc-one-iplayer-michael-socha"
+      },
+      {
+        "headline": "People in UK spend fewer years in good health than a decade ago, study finds",
+        "url": "https://www.theguardian.com/society/2026/apr/27/people-in-uk-spend-fewer-years-in-good-health-than-a-decade-ago-study-finds"
+      },
+      {
+        "headline": "UK urged to deploy EU-style ‘trade bazooka’ against Trump’s tariffs",
+        "url": "https://www.theguardian.com/business/2026/apr/26/uk-urged-deploy-eu-style-trade-bazooka-trump-tariffs"
+      },
+      {
+        "headline": "We booked £4,000 in EasyJet flights – but it won’t let us postpone them all after devastating news",
+        "url": "https://www.theguardian.com/money/2026/apr/27/easyjet-flights-postpone-booking-refund-credit"
+      }
+    ]
+  },
+  {
+    "site": "Financial Times",
+    "pageUrl": "https://www.ft.com/",
+    "articles": [
+      {
+        "headline": "Trump and the recurring assassin",
+        "url": "https://www.ft.com/content/8c6b2e4e-8096-4087-9082-6ca4548f1045"
+      },
+      {
+        "headline": "Why the UAE asked Pakistan for its $3.5bn back",
+        "url": "https://www.ft.com/content/99073d6e-4b57-417f-88fb-7a2c0e55eef3"
+      },
+      {
+        "headline": "Alleged Trump shooter was targeting US officials, authorities say",
+        "url": "https://www.ft.com/content/2f922f3f-8232-4541-bfeb-66697b1d8790"
+      },
+      {
+        "headline": "Good news for business travellers",
+        "url": "https://www.ft.com/content/56acca43-5d36-4eee-8c03-17b4e9ab6e5d"
+      },
+      {
+        "headline": "Trump rushed offstage at White House correspondents’ dinner after shots fired",
+        "url": "https://www.ft.com/content/a5b3add2-eee6-41d8-9353-f1bdc2b77398"
+      }
+    ]
+  },
+  {
+    "site": "The Verge",
+    "pageUrl": "https://www.theverge.com/",
+    "articles": [
+      {
+        "headline": "Trump turns the WHCD shooting into a pitch for the White House ballroom",
+        "url": "https://www.theverge.com/policy/918843/trump-whcd-attack-white-house-ballroom"
+      },
+      {
+        "headline": "After three months on Linux, I don’t miss Windows at all",
+        "url": "https://www.theverge.com/tech/918797/switched-to-linux-dont-miss-windows"
+      },
+      {
+        "headline": "The plan to quietly kill Coyote v. Acme blew up in David Zaslav’s face",
+        "url": "https://www.theverge.com/column/918079/david-zaslav-warner-bros-discovery-coyote-v-acme-batgirl-tax-writeoffs"
+      },
+      {
+        "headline": "Tomora’s Come Closer is an ecstatic love letter to 90s dance music",
+        "url": "https://www.theverge.com/entertainment/918826/tomora-come-closer-review-90s-dance-music"
+      },
+      {
+        "headline": "The US gets the worst phones",
+        "url": "https://www.theverge.com/gadgets/917340/us-worst-smartphones-china-batteries-cameras-apple-iphone-john-ternus"
+      }
+    ]
+  }
+]
