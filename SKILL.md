@@ -211,11 +211,22 @@ cat > /tmp/briefing-script.txt << 'SCRIPT'
 SCRIPT
 ```
 
-2. **Generate the MP3** using `podcast-tts` and **capture the cost**:
+2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Send a short plain-text message tagging `@Cosimo` so they get a push notification and can tap the link to start listening within ~10s of generation kicking off:
+
+```text
+🔴 Live now (give it ~10s for the first segment): https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/podcast/live/briefing-episode/
+@Cosimo
+```
+
+(Use `briefing-episode` as the basename — it must match the basename of the MP3 output path in the next step.)
+
+3. **Generate the MP3** using `podcast-tts` with `--live` so it produces an HLS event-playlist alongside the final MP3, and **capture the cost**:
 
 ```bash
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer < /tmp/briefing-script.txt)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer --live < /tmp/briefing-script.txt)
 ```
+
+The `--live` flag writes `index.m3u8` + fmp4 segments into `/home/lupocos/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
 
 Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
 
@@ -234,7 +245,7 @@ TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer --r
 
 The script prints a `COST:$X.XXXX` line to stdout. Extract it: `TTS_COST=$(echo "$TTS_OUTPUT" | grep '^COST:' | cut -d: -f2)`. Include this cost in the notification message to the user.
 
-3. **Publish to the podcast feed** (with show notes linking to transcript + native SRT transcript):
+4. **Publish to the podcast feed** (with show notes linking to transcript + native SRT transcript):
 
 ```bash
 TITLE="News Briefing - $(date +'%B %-d, %Y')"
@@ -273,7 +284,7 @@ rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
 
 Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
 
-4. **Notify the user**: Post a **plain text message in the current chat** (do NOT use `speak`, do NOT use `send_message_to_workspace` — both waste credits). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically.
+5. **Notify the user**: Post a **plain text message in the current chat** (do NOT use `speak`, do NOT use `send_message_to_workspace` — both waste credits). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
 **Voice presets**: Default is `qwen-jason-palmer` (Qwen3-TTS clone, free local). Pass `--voice` from the user's args through to `podcast-tts`.
 
