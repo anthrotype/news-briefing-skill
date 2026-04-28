@@ -240,7 +240,7 @@ The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk |
 2. Retry with `--restart-omlx`, which unconditionally restarts oMLX and waits for it to be ready before sending the first chunk:
 
 ```bash
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer --restart-omlx < /tmp/briefing-script.txt)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer --live --restart-omlx < /tmp/briefing-script.txt)
 ```
 
 The script prints a `COST:$X.XXXX` line to stdout. Extract it: `TTS_COST=$(echo "$TTS_OUTPUT" | grep '^COST:' | cut -d: -f2)`. Include this cost in the notification message to the user.
