@@ -39,9 +39,9 @@ Use this output as the authoritative date throughout the briefing (episode title
 Run the headlines script to get current top stories with URLs from all 5 news sources:
 
 ```bash
-cd /home/lupocos/projects/oss/news-briefing-skill && \
+cd /Users/Shared/projects/oss/news-briefing-skill && \
 npx tsx scripts/get-news-with-urls.ts 2>/dev/null | \
-node /home/claude/.claude/skills/news-briefing/scripts/save-and-diff-headlines.js
+node /Users/claude/.claude/skills/news-briefing/scripts/save-and-diff-headlines.js
 ```
 
 This returns annotated JSON with headlines and article URLs from:
@@ -66,7 +66,7 @@ Read `references/preferences.md` to understand learned topic interests and artic
 Read `references/article-history.json` to see which articles were covered in the past 7 days. **Do NOT re-select articles that appear in this file.**
 
 ```bash
-cat /home/claude/.claude/skills/news-briefing/references/article-history.json
+cat /Users/claude/.claude/skills/news-briefing/references/article-history.json
 ```
 
 The file contains an array of recently used articles with their URLs, headlines, and dates. Ensure your selections are fresh.
@@ -90,7 +90,7 @@ Autonomously select 3 articles that:
 After selecting your 3 articles, **immediately update** `references/article-history.json` to record them. This prevents re-using the same articles in future briefings.
 
 ```bash
-cd /home/claude/.claude/skills/news-briefing && \
+cd /Users/claude/.claude/skills/news-briefing && \
 node scripts/update-article-history.js \
   "ARTICLE_1_URL" "ARTICLE_1_HEADLINE" \
   "ARTICLE_2_URL" "ARTICLE_2_HEADLINE" \
@@ -214,7 +214,7 @@ SCRIPT
 2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Send a short plain-text message tagging `@Cosimo` so they get a push notification and can tap the link to start listening within ~10s of generation kicking off:
 
 ```text
-🔴 Live now (give it ~10s for the first segment): https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/podcast/live/briefing-episode/
+🔴 Live now (give it ~10s for the first segment): https://cosimos-mac-studio.tail2af01f.ts.net/podcast/live/briefing-episode/
 @Cosimo
 ```
 
@@ -226,7 +226,7 @@ SCRIPT
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer --live < /tmp/briefing-script.txt)
 ```
 
-The `--live` flag writes `index.m3u8` + fmp4 segments into `/home/lupocos/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
+The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
 
 Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
 
@@ -252,12 +252,12 @@ TITLE="News Briefing - $(date +'%B %-d, %Y')"
 DESCRIPTION="AI-curated daily news briefing: [brief summary of the 3 articles covered]"
 
 # Save formatted script to static/articles/ (linked from show notes)
-ARTICLES_DIR="/home/lupocos/projects/static/articles"
+ARTICLES_DIR="/Users/Shared/projects/static/articles"
 mkdir -p "$ARTICLES_DIR"
 SLUG="news-briefing-$(date +%Y-%m-%d)"
 cp /tmp/briefing-script.txt "$ARTICLES_DIR/${SLUG}.md"
 chmod 644 "$ARTICLES_DIR/${SLUG}.md"
-TRANSCRIPT_URL="https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/articles/${SLUG}.md"
+TRANSCRIPT_URL="https://cosimos-mac-studio.tail2af01f.ts.net/articles/${SLUG}.md"
 
 # Generate timestamped SRT transcript via Groq Whisper (~4s for 15min audio at 200x realtime)
 # This is the most reliable way to get accurate word-level timing for AntennaPod sync.
@@ -305,7 +305,7 @@ mcp__whatsapp-agent-tools__speak({
 Save the script to `static/articles/` and share the URL:
 
 ```bash
-ARTICLES_DIR="/home/lupocos/projects/static/articles"
+ARTICLES_DIR="/Users/Shared/projects/static/articles"
 mkdir -p "$ARTICLES_DIR"
 SLUG="news-briefing-$(date +%Y-%m-%d)"
 TRANSCRIPT_FILE="$ARTICLES_DIR/${SLUG}.md"
@@ -318,7 +318,7 @@ cat > "$TRANSCRIPT_FILE" << 'EOF'
 EOF
 
 chmod 644 "$TRANSCRIPT_FILE"
-echo "Transcript available at: https://hetzner-ubuntu-4gb-nbg.tail2af01f.ts.net/articles/${SLUG}.md"
+echo "Transcript available at: https://cosimos-mac-studio.tail2af01f.ts.net/articles/${SLUG}.md"
 ```
 
 ### 7. Capture Feedback
