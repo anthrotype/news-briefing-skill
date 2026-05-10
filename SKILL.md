@@ -40,7 +40,7 @@ Run the headlines script to get current top stories with URLs from all 5 news so
 
 ```bash
 cd /Users/Shared/projects/oss/news-briefing-skill && \
-npx tsx scripts/get-news-with-urls.ts 2>/dev/null | \
+PATH="/opt/homebrew/opt/node@25/bin:/opt/homebrew/bin:$PATH" npx tsx scripts/get-news-with-urls.ts 2>/dev/null | \
 node /Users/claude/.claude/skills/news-briefing/scripts/save-and-diff-headlines.js
 ```
 
@@ -284,7 +284,27 @@ rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
 
 Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
 
-5. **Notify the user**: Post a **plain text message in the current chat** (do NOT use `speak`, do NOT use `send_message_to_workspace` — both waste credits). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
+5. **Save to Spotify** (in addition to the podcast feed):
+
+```bash
+# Upload to the "Daily Briefing" show on Spotify
+COVER_IMG="/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg"
+SPOTIFY_RESULT=$(save-to-spotify --json upload /tmp/briefing-episode.mp3 \
+  --title "$TITLE" \
+  --summary "$DESCRIPTION" \
+  --image "$COVER_IMG" \
+  --show-id spotify:show:033dnvdmfbg1F8Ch3wd5sd \
+  --language en 2>&1)
+SPOTIFY_URI=$(echo "$SPOTIFY_RESULT" | jq -r '.episode_uri // empty')
+if [ -n "$SPOTIFY_URI" ]; then
+  SPOTIFY_EP_ID=$(echo "$SPOTIFY_URI" | sed 's/spotify:episode://')
+  save-to-spotify --json episodes status "$SPOTIFY_EP_ID" --wait 2>&1 | jq -r '.readiness'
+fi
+```
+
+The show `spotify:show:033dnvdmfbg1F8Ch3wd5sd` ("Daily Briefing") is pre-created. Cover art is at `/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg` (terracotta starburst, matching the podcast feed). Episodes are private to the user's Spotify library. If `save-to-spotify` is not on PATH or auth has expired, skip this step silently and note it in the notification — don't block the briefing.
+
+6. **Notify the user**: Post a **plain text message in the current chat** (do NOT use `speak`, do NOT use `send_message_to_workspace` — both waste credits). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). If the Spotify upload succeeded, mention it (e.g. "Also on Spotify"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
 **Voice presets**: Default is `qwen-jason-palmer` (Qwen3-TTS clone, free local). Pass `--voice` from the user's args through to `podcast-tts`.
 
@@ -337,7 +357,7 @@ When feedback is received, update `references/preferences.md` immediately:
 ## Tips
 
 **Mode selection:**
-- Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale
+- Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale AND to Spotify via `save-to-spotify`
 - Use `--whatsapp` for immediate voice message delivery (e.g. when user wants it NOW)
 - Use `--text-only` to skip TTS entirely (fastest, no cost)
 - The `--voice` flag controls TTS: `chris-brift` (ElevenLabs, default), `archer` (younger editorial), `adam-stone` (deeper), or `aoede` (Gemini, free)

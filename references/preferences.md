@@ -89,3 +89,8 @@ This file tracks learned preferences from user feedback to improve article selec
 - All three AI-infrastructure focused articles worked well
 - Requested: More room for broader headlines, trim deep-dives slightly
 - Voice: Preferred default voice over Rachel (ElevenLabs API)
+
+### 2026-05-10
+- **Too thematically clustered**: all three articles (Caspian/Iran-Russia, Ukraine ceasefire/Putin, Tuapse oil strike) were from the same geopolitical theatre — not a Russia problem specifically, a variety problem
+- **Ensure the 3 deep-dives span different domains**, even when one theme dominates the headlines. At least 1 should come from a clearly different area (science, economics, tech, UK/European domestic politics, etc.) — unless the story is a genuinely historic breaking event (cf. 2026-03-01 feedback)
+- Good alternatives were available today: CAR-T cancer therapy (Guardian), Friedrich Merz (Economist), Hormuz energy market angle (FT/NYT)
