@@ -136,6 +136,8 @@ agent-browser pdf /tmp/article1-layout.pdf
 
 Then read the PDF yourself to understand the article's visual layout and distinguish body text from chart noise.
 
+**DataDome block (NYT and others):** If `scrape-remote` exits with the message "Blocked by DataDome bot protection", do **not** retry — retrying won't help. Skip immediately and pick the next best candidate from the headlines list. NYT is currently unreliable due to DataDome; prefer FT, Economist, Guardian, or Verge for deep-dive articles.
+
 If an article still fails after all fallbacks, skip it and pick an alternative from the headlines list. Do not block the entire briefing on one failed scrape.
 
 ### 5. Write Podcast Script
