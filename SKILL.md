@@ -158,6 +158,16 @@ Create a podcast script with this structure, using `---` on its own line to sepa
 - Cover politics, economics, business, tech from the fresh headlines — paint the full picture of what's actually new today
 - End with a preview of the 3 deep-dive articles **in the order you've chosen** (match the ordering below)
 
+**MANDATORY HEADLINES FACT-CHECK — do this before writing a single sentence of the intro:**
+
+For every story you plan to mention in the headlines roundup, verify against the raw headlines JSON:
+1. **Who** — is the subject of your sentence actually the subject of that headline? Don't conflate actors across stories.
+2. **What** — does the action or claim you're attributing match what the headline says? Don't invent or strengthen claims.
+3. **Where** — does the geography match? A story about Moscow is not "In the Middle East." A story about London is not "In Europe." Check before using any geographic label.
+4. **Which source** — confirm the article is actually in today's headlines list, not a half-remembered story from earlier in the session.
+
+If you cannot trace a specific claim directly back to a headline URL in the fetched data, **cut it**. The headlines roundup is the one section where factual accuracy is non-negotiable — the listener trusts it to be true. Getting it wrong is not a style problem, it is a failure of the briefing's core function. When in doubt, say less.
+
 ---
 
 **Article 1 (3-4 minutes)** — standalone or loosely connected
