@@ -223,7 +223,7 @@ cat > /tmp/briefing-script.txt << 'SCRIPT'
 SCRIPT
 ```
 
-2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Send a short plain-text message tagging `@Cosimo` so they get a push notification and can tap the link to start listening within ~10s of generation kicking off:
+2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. The `@Cosimo` tag triggers a push notification:
 
 ```text
 🔴 Live now (give it ~10s for the first segment): https://cosimos-mac-studio.tail2af01f.ts.net/podcast/live/briefing-episode/
@@ -242,7 +242,9 @@ The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projec
 
 Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
 
-The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk | eta ~8m`. **Watch this output** to detect problems early:
+**Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Run the command via `Bash` with `run_in_background: true` — you'll get a single notification when it finishes. Then just **wait**. Do other prep work (save transcript to `static/articles/`, prepare publish commands) and let the notification arrive. **Do NOT poll** segment counts or process status in a loop of individual Bash calls — the notification is the signal.
+
+The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk | eta ~8m`. If run in background, this output lands in the task output file.
 
 - **Normal speed** (qwen-jason-palmer): ~8-12s per chunk. If the first few chunks land in that range, let it run.
 - **Stuck**: if no `done in ...` line appears for >2 minutes after a `Generating chunk X/Y...` line, the oMLX server is likely stuck on that chunk.
@@ -316,7 +318,7 @@ fi
 
 The show `spotify:show:033dnvdmfbg1F8Ch3wd5sd` ("Daily Briefing") is pre-created. Cover art is at `/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg` (terracotta starburst, matching the podcast feed). Episodes are private to the user's Spotify library. If `save-to-spotify` is not on PATH or auth has expired, skip this step silently and note it in the notification — don't block the briefing.
 
-6. **Notify the user**: Post a **plain text message in the current chat** (do NOT use `speak`, do NOT use `send_message_to_workspace` — both waste credits). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). If the Spotify upload succeeded, mention it (e.g. "Also on Spotify"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
+6. **Notify the user**: Just output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). If the Spotify upload succeeded, mention it (e.g. "Also on Spotify"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
 **Voice presets**: Default is `qwen-jason-palmer` (Qwen3-TTS clone, free local). Pass `--voice` from the user's args through to `podcast-tts`.
 
