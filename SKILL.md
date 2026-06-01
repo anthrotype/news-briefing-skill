@@ -242,9 +242,9 @@ The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projec
 
 Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
 
-**Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Run the command via `Bash` with `run_in_background: true` — you'll get a single notification when it finishes. Then just **wait**. Do other prep work (save transcript to `static/articles/`, prepare publish commands) and let the notification arrive. **Do NOT poll** segment counts or process status in a loop of individual Bash calls — the notification is the signal.
+**Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Run the command via `Bash` with `run_in_background: true` — the background task completion notification will automatically wake you up when it finishes. After starting it, do only quick prep work that is useful immediately (save transcript to `static/articles/`, prepare publish commands), then **end your turn and trust the harness**. Do not block on `TaskOutput`, do not keep the turn open just to wait, and do not poll segment counts or process status in a loop of individual Bash calls. The notification is the signal; resume publishing when the harness re-invokes you.
 
-The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk | eta ~8m`. If run in background, this output lands in the task output file.
+The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk | eta ~8m`. If run in background, this output lands in the task output file. Inspect it only after the completion notification, when diagnosing a suspected stuck run, or if the user explicitly asks for status.
 
 - **Normal speed** (qwen-jason-palmer): ~8-12s per chunk. If the first few chunks land in that range, let it run.
 - **Stuck**: if no `done in ...` line appears for >2 minutes after a `Generating chunk X/Y...` line, the oMLX server is likely stuck on that chunk.
