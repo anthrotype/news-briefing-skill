@@ -41,6 +41,7 @@ This file tracks learned preferences from user feedback to improve article selec
 - **Product reviews** (consumer tech reviews, gadget launches, etc.)
 - Celebrity/personality-focused stories
 - Short breaking news without analysis
+- **Subject-matter repetition**: Do not cover the same core company, individual, or developing story (e.g. SpaceX/Musk, a specific geopolitical conflict, or a particular company's ongoing drama) more than once in a 7-day window. The 7-day history check applies to the *substance* of the story, not just the specific article URL. *Exception*: Genuinely historic, fast-moving breaking news of global significance (such as major geopolitical or macroeconomic crises) can be covered if there is a substantial new development, but ordinary corporate news or incremental follow-ups should be skipped.
 
 ## Coverage Balance Preferences
 
@@ -97,3 +98,6 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ### 2026-06-03
 - **Avoid US political jargon**: "GOP" wasn't obvious to the listener. Use "Republicans" or "the Republican Party" instead. Generally spell out any US-specific acronyms or shorthand (e.g. don't assume familiarity with "DNC", "SCOTUS", etc.) — the audience is UK-based.
+
+### 2026-06-04
+- **Avoid subject/topic repetition**: Re-selected SpaceX/Musk IPO within a few days of two previous SpaceX/Musk briefings (May 29/30). Even though the article URL was different and contained new specific details, the core subject-matter was repetitive. Broadened the 7-day restriction rule to cover the core *topic and entity*, not just identical article URLs, while keeping a clear exception for fast-moving, globally significant historic breaking news.
