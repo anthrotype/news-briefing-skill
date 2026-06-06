@@ -242,6 +242,12 @@ The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projec
 
 Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
 
+**ElevenReader voices** (`er-*` presets): When the voice is an ElevenReader preset, also pass `--keep-read --title "$TITLE"` so the document stays in the ElevenReader library as a secondary consumption channel via their mobile app. ElevenReader is a batch engine (no `--live` streaming), so skip the live URL announcement in step 2. Example:
+
+```bash
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-jason-palmer --keep-read --title "$TITLE" < /tmp/briefing-script.txt)
+```
+
 **Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Run the command via `Bash` with `run_in_background: true` — the background task notification will automatically wake you up whether the command exits successfully or fails with a nonzero status. After starting it, do only quick prep work that is useful immediately (save transcript to `static/articles/`, prepare publish commands), then **end your turn and trust the harness**. Do not block on `TaskOutput`, do not keep the turn open just to wait, and do not poll segment counts or process status in a loop of individual Bash calls. The notification is the signal; resume publishing or recovery when the harness re-invokes you, or when the user explicitly reports a problem.
 
 The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk | eta ~8m`. If run in background, this output lands in the task output file. Inspect it only after the completion/failure notification or if the user explicitly asks for status.
