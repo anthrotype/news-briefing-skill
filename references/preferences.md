@@ -51,7 +51,7 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ## Voice Preferences
 
-- **Always use Qwen Jason Palmer voice** (`qwen-jason-palmer`, free local Mac Studio) — user explicitly prefers this
+- **Always use MOSS Jason Palmer voice** (`moss-jason-palmer`, free local Mac Studio) — switched from qwen-jason-palmer per user request (2026-06-09)
 - Conversational, engaging tone
 - Avoid flat, monotone delivery
 
@@ -101,3 +101,6 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ### 2026-06-04
 - **Avoid subject/topic repetition**: Re-selected SpaceX/Musk IPO within a few days of two previous SpaceX/Musk briefings (May 29/30). Even though the article URL was different and contained new specific details, the core subject-matter was repetitive. Broadened the 7-day restriction rule to cover the core *topic and entity*, not just identical article URLs, while keeping a clear exception for fast-moving, globally significant historic breaking news.
+
+### 2026-06-09
+- **Voice**: Switch from Qwen Jason Palmer to MOSS Jason Palmer (`moss-jason-palmer`) — MOSS is now the default local TTS engine, user wants consistency
