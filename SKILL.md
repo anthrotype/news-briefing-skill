@@ -1,7 +1,7 @@
 ---
 name: news-briefing
 description: Generate daily news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge). Supports both audio (via TTS) and text-only modes.
-args: "[--text-only] [--whatsapp] [--voice aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift]"
+args: "[--text-only] [--whatsapp] [--voice moss-marc-filippino|er-marc-filippino|aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift]"
 ---
 
 # News Briefing
@@ -10,7 +10,7 @@ Generate personalized daily news briefings by fetching headlines from 5 major ne
 
 ## Usage
 
-- **Podcast mode (default)**: `/news-briefing` - Generates MP3 via Qwen3-TTS cloned Jason Palmer voice (free, local), publishes to private podcast feed
+- **Podcast mode (default)**: `/news-briefing` - Generates MP3 via MOSS-TTS cloned Marc Filippino voice (free, local), publishes to private podcast feed
 - **Voice choice**: `/news-briefing --voice aoede-pro` - Uses Gemini Pro model (2x cost, richer expressivity)
 - **Voice choice**: `/news-briefing --voice adam-stone` - Uses ElevenLabs Adam Stone voice instead (1.2x, pricier)
 - **Voice choice**: `/news-briefing --voice chris-brift` - Uses ElevenLabs Chris Brift voice
@@ -235,17 +235,17 @@ SCRIPT
 3. **Generate the MP3** using `podcast-tts` with `--live` so it produces an HLS event-playlist alongside the final MP3, and **capture the cost**:
 
 ```bash
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice qwen-jason-palmer --live < /tmp/briefing-script.txt)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice moss-marc-filippino --live < /tmp/briefing-script.txt)
 ```
 
 The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
 
-Pass through the `--voice` flag from the user's args. Default is `qwen-jason-palmer` if not specified.
+Pass through the `--voice` flag from the user's args. Default is `moss-marc-filippino` if not specified. Use `er-marc-filippino` when the user explicitly asks for ElevenReader (faster, cloud-based, flat-rate Ultra subscription, but no `--live` streaming).
 
 **ElevenReader voices** (`er-*` presets): When the voice is an ElevenReader preset, also pass `--keep-read --title "$TITLE"` so the document stays in the ElevenReader library as a secondary consumption channel via their mobile app. ElevenReader is a batch engine (no `--live` streaming), so skip the live URL announcement in step 2. Example:
 
 ```bash
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-jason-palmer --keep-read --title "$TITLE" < /tmp/briefing-script.txt)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-marc-filippino --keep-read --title "$TITLE" < /tmp/briefing-script.txt)
 ```
 
 **Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Run the command via `Bash` with `run_in_background: true` — the background task notification will automatically wake you up whether the command exits successfully or fails with a nonzero status. After starting it, do only quick prep work that is useful immediately (save transcript to `static/articles/`, prepare publish commands), then **end your turn and trust the harness**. Do not block on `TaskOutput`, do not keep the turn open just to wait, and do not poll segment counts or process status in a loop of individual Bash calls. The notification is the signal; resume publishing or recovery when the harness re-invokes you, or when the user explicitly reports a problem.
@@ -291,7 +291,11 @@ rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
 
 Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
 
-5. **Save to Spotify** (in addition to the podcast feed):
+5. **Save to Spotify** (optional — only when user explicitly asks for it or passes `--spotify`):
+
+**Skip by default.** The user primarily listens via Apple Podcasts; Spotify upload is an explicit opt-in.
+
+If the user asks for Spotify, run:
 
 ```bash
 # Upload to the "Daily Briefing" show on Spotify
@@ -309,11 +313,11 @@ if [ -n "$SPOTIFY_URI" ]; then
 fi
 ```
 
-The show `spotify:show:033dnvdmfbg1F8Ch3wd5sd` ("Daily Briefing") is pre-created. Cover art is at `/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg` (terracotta starburst, matching the podcast feed). Episodes are private to the user's Spotify library. If `save-to-spotify` is not on PATH or auth has expired, skip this step silently and note it in the notification — don't block the briefing.
+The show `spotify:show:033dnvdmfbg1F8Ch3wd5sd` ("Daily Briefing") is pre-created. Cover art is at `/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg` (terracotta starburst, matching the podcast feed). Episodes are private to the user's Spotify library. If `save-to-spotify` is not on PATH or auth has expired, skip this step silently — don't block the briefing.
 
-6. **Notify the user**: Just output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). If the Spotify upload succeeded, mention it (e.g. "Also on Spotify"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
+6. **Notify the user**: Just output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
-**Voice presets**: Default is `qwen-jason-palmer` (Qwen3-TTS clone, free local). Pass `--voice` from the user's args through to `podcast-tts`.
+**Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. Use `er-marc-filippino` when the user wants ElevenReader (faster, cloud, no `--live`).
 
 #### WhatsApp Mode (--whatsapp)
 
@@ -322,8 +326,8 @@ If the user passed `--whatsapp`, use the `speak` MCP tool instead to send as a v
 ```typescript
 mcp__whatsapp-agent-tools__speak({
   text: "Read this in a natural, engaging British newsreader style:\n\n[Full podcast script here...]",
-  engine: "gemini",
-  voiceId: "Aoede"
+  engine: "moss",
+  voiceId: "marc-filippino"
 })
 ```
 
@@ -364,7 +368,7 @@ When feedback is received, update `references/preferences.md` immediately:
 ## Tips
 
 **Mode selection:**
-- Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale AND to Spotify via `save-to-spotify`
+- Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale. Spotify upload is opt-in only (pass `--spotify` or user explicitly requests it)
 - Use `--whatsapp` for immediate voice message delivery (e.g. when user wants it NOW)
 - Use `--text-only` to skip TTS entirely (fastest, no cost)
 - The `--voice` flag controls TTS: `chris-brift` (ElevenLabs, default), `archer` (younger editorial), `adam-stone` (deeper), or `aoede` (Gemini, free)
@@ -386,7 +390,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph
 
 **Voice delivery (podcast/whatsapp modes):**
-- `--voice qwen-jason-palmer` (default): Qwen3-TTS cloned Jason Palmer voice (free, local Mac Studio)
+- `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio). Use `er-marc-filippino` for ElevenReader (cloud, faster, no live streaming).
 - `--voice aoede`: Gemini Flash, female British newsreader, cheap
 - `--voice aoede-pro`: Gemini Pro, female British newsreader, 2x cost, richer expressivity
 - `--voice adam-stone`: ElevenLabs, smooth/deep male, 1.2x speed, pricier

@@ -104,3 +104,6 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ### 2026-06-09
 - **Voice**: Switch from Qwen Jason Palmer to MOSS Jason Palmer (`moss-jason-palmer`) — MOSS is now the default local TTS engine, user wants consistency
+### 2026-06-18
+- **Voice**: User requested Marc Filippino via ElevenReader TTS (`er-marc-filippino`) for this session
+- **Spotify**: Skip by default — user rarely listens there, prefers Apple Podcasts. Only upload if user explicitly requests it (`--spotify` flag or direct ask)
