@@ -61,15 +61,21 @@ Each article has an `isNew` field (`true`/`false`) indicating whether its URL ap
 
 Read `references/preferences.md` to understand learned topic interests and article selection patterns. Use this to inform your choices in the next step.
 
-### 2.5. Check Article History
+### 2.5. Check Article History and Recent Summaries
 
-Read `references/article-history.json` to see which articles were covered in the past 7 days. **Do NOT re-select articles that appear in this file.**
+Run both checks in parallel:
 
 ```bash
 cat /Users/claude/.claude/skills/news-briefing/references/article-history.json
+cat /Users/claude/.claude/skills/news-briefing/references/recent_summaries.json
 ```
 
-The file contains an array of recently used articles with their URLs, headlines, and dates. Ensure your selections are fresh.
+**Article history** (`article-history.json`): lists every article URL used as a deep-dive in the past 7 days. Do NOT re-select any article that appears here.
+
+**Recent summaries** (`recent_summaries.json`): one entry per day with the headline topics covered and the 3 deep-dive subjects. Use this to:
+- Avoid repeating headline topics that have dominated the roundup all week (e.g. if Iran has led the intro every day, say less about it today even if it's still in the headlines)
+- Spot thematic drift — if the past few deep-dives have all been geopolitics or all been tech, weight today's picks toward variety
+- Notice developing threads worth brief callback ("as we covered earlier this week...")
 
 ### 3. Select Articles
 
@@ -221,6 +227,17 @@ Generate the audio using `podcast-tts` and publish to the podcast feed. This wor
 cat > /tmp/briefing-script.txt << 'SCRIPT'
 [Full podcast script here — just the content, no style instructions]
 SCRIPT
+```
+
+1.5. **Update recent summaries** with today's headline topics and deep-dive subjects. Write 4-7 short headline bullets (what you actually covered in the intro roundup, not the deep-dives) and 3 deep-dive labels:
+
+```bash
+cd /Users/claude/.claude/skills/news-briefing && \
+node scripts/update-recent-summaries.js '{
+  "date": "YYYY-MM-DD",
+  "headlines_topics": ["topic 1", "topic 2", "..."],
+  "deep_dives": ["Article 1 subject", "Article 2 subject", "Article 3 subject"]
+}'
 ```
 
 2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. The `@Cosimo` tag triggers a push notification:
