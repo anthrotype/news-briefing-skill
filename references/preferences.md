@@ -49,13 +49,10 @@ This file tracks learned preferences from user feedback to improve article selec
 - Deep-dive articles: 3-4 minutes each (trimmed from original 3-4 minutes)
 - Total length: 10-15 minutes
 
-## Voice Preferences
-
-- **Always use MOSS Jason Palmer voice** (`moss-jason-palmer`, free local Mac Studio) — switched from qwen-jason-palmer per user request (2026-06-09)
-- Conversational, engaging tone
-- Avoid flat, monotone delivery
-
 ## Feedback History
+
+### 2026-06-19
+- **Voice**: Switch from MOSS Jason Palmer to MOSS Marc Filippino (`moss-marc-filippino`) -- this is now the standing default. Skill SKILL.md already says `moss-marc-filippino` is the default; preferences.md was stale.
 
 ### 2026-02-08
 - **Critical issue**: Reused 2 out of 3 articles from previous briefing (Economist dollar article, FT tech crash article)
