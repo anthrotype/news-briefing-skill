@@ -49,11 +49,17 @@ if (fs.existsSync(FILE)) {
   }
 }
 
-// Remove any existing entry for the same date (replace/update)
-data.summaries = data.summaries.filter(s => s.date !== entry.date);
-
-// Append new entry
-data.summaries.push(entry);
+// Merge with existing entry for the same date, if any (same-day rerun support)
+const existingIdx = data.summaries.findIndex(s => s.date === entry.date);
+if (existingIdx !== -1) {
+  const existing = data.summaries[existingIdx];
+  existing.headlines_topics = [...existing.headlines_topics, ...entry.headlines_topics];
+  existing.deep_dives = [...existing.deep_dives, ...entry.deep_dives];
+  data.summaries[existingIdx] = existing;
+} else {
+  // Append new entry
+  data.summaries.push(entry);
+}
 
 // Sort by date ascending
 data.summaries.sort((a, b) => a.date.localeCompare(b.date));

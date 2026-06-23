@@ -77,6 +77,11 @@ cat /Users/claude/.claude/skills/news-briefing/references/recent_summaries.json
 - Spot thematic drift — if the past few deep-dives have all been geopolitics or all been tech, weight today's picks toward variety
 - Notice developing threads worth brief callback ("as we covered earlier this week...")
 
+**Same-day rerun detection:** If today's date already has an entry in `recent_summaries.json`, another agent has already run the briefing today. This is expected and fine — treat it like any other rerun:
+- The `headlines_topics` and `deep_dives` arrays in today's entry show what the earlier briefing covered. Treat these exactly like yesterday's topics when deciding what to skip or mention lightly.
+- Article history already contains the earlier briefing's deep-dive URLs, so the normal 7-day dedup check will prevent you from reusing those articles.
+- Note this for the title suffix in step 6 — you'll need to disambiguate the episode title.
+
 ### 3. Select Articles
 
 Autonomously select 3 articles that:
@@ -85,6 +90,7 @@ Autonomously select 3 articles that:
 - Span different topics when possible (avoid 3 articles on same story)
 - Come from different sources when possible (prefer variety)
 - **Prefer `isNew: true` articles** — articles marked `isNew: false` were already in yesterday's fetch and should only be picked if they are clearly the best available option and represent a major ongoing story
+- **On a same-day rerun:** avoid the topics and deep-dive subjects listed in today's existing `recent_summaries` entry. Treat them the same as yesterday's coverage — don't repeat, or if a story is unavoidable, approach it from a clearly different angle.
 
 **Selection criteria:**
 - High priority: AI industry dynamics, tech business strategy, economic policy
@@ -272,13 +278,33 @@ The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk |
 4. **Publish to the podcast feed** (with show notes linking to transcript + native SRT transcript):
 
 ```bash
-TITLE="News Briefing - $(date +'%B %-d, %Y')"
+# Title suffix for same-day reruns — check if today already has a summaries entry
+TODAY=$(TZ=Europe/London date +%Y-%m-%d)
+EXISTING_ENTRY=$(python3 -c "
+import json, sys
+data = json.load(open('/Users/claude/.claude/skills/news-briefing/references/recent_summaries.json'))
+print('yes' if any(s['date'] == '$TODAY' for s in data['summaries']) else 'no')
+" 2>/dev/null)
+
+if [ "$EXISTING_ENTRY" = "yes" ]; then
+  HOUR=$(TZ=Europe/London date +%H)
+  if   [ "$HOUR" -lt 12 ]; then SUFFIX=" (Morning)"
+  elif [ "$HOUR" -lt 17 ]; then SUFFIX=" (Afternoon)"
+  elif [ "$HOUR" -lt 22 ]; then SUFFIX=" (Evening)"
+  else                           SUFFIX=" (Late Edition)"
+  fi
+else
+  SUFFIX=""
+fi
+
+TITLE="News Briefing - $(TZ=Europe/London date +'%B %-d, %Y')${SUFFIX}"
 DESCRIPTION="AI-curated daily news briefing: [brief summary of the 3 articles covered]"
 
 # Save formatted script to static/articles/ (linked from show notes)
+# Include a timestamp in the slug to avoid overwriting a same-day earlier briefing's transcript
 ARTICLES_DIR="/Users/Shared/projects/static/articles"
 mkdir -p "$ARTICLES_DIR"
-SLUG="news-briefing-$(date +%Y-%m-%d)"
+SLUG="news-briefing-$(TZ=Europe/London date +%Y-%m-%d)$([ -n "$SUFFIX" ] && TZ=Europe/London date +-%H%M)"
 cp /tmp/briefing-script.txt "$ARTICLES_DIR/${SLUG}.md"
 chmod 644 "$ARTICLES_DIR/${SLUG}.md"
 TRANSCRIPT_URL="https://cosimos-mac-studio.tail2af01f.ts.net/articles/${SLUG}.md"
