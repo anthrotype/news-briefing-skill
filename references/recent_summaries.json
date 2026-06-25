@@ -1,102 +1,6 @@
 {
   "summaries": [
     {
-      "date": "2026-06-12",
-      "headlines_topics": [
-        "SpaceX IPO raises $75B, largest in history",
-        "Trump signals US-Iran deal, calls off military strikes",
-        "UK Defence Secretary Healey resigns over military funding",
-        "Sectarian violence fears in Belfast",
-        "NATO commander: Russia not looking for conflict",
-        "Thailand Princess Bajrakitiyabha dies aged 47"
-      ],
-      "deep_dives": [
-        "Keir Starmer government crisis over defence spending",
-        "Who should share in AI wealth -- proposals and limits",
-        "China excluded from SpaceX IPO, capital decoupling underway"
-      ]
-    },
-    {
-      "date": "2026-06-13",
-      "headlines_topics": [
-        "SpaceX $75B IPO makes Musk world first trillionaire",
-        "US orders Anthropic to block foreign access to models",
-        "US-Iran peace deal text agreed per Pakistan PM",
-        "Swiss referendum on capping population at 10 million",
-        "Lebanon caught in Iran-Israel conflict crossfire",
-        "Dutch far-right penalised for AI image manipulation"
-      ],
-      "deep_dives": [
-        "Swiss vote on capping population at 10 million",
-        "US government shuts down Anthropic two flagship AI models",
-        "Rise of local culture vs feared global monoculture"
-      ]
-    },
-    {
-      "date": "2026-06-14",
-      "headlines_topics": [
-        "Scotland wins first World Cup match since 1990",
-        "New York Knicks win first NBA championship since 1973",
-        "Tommy Robinson detained at Heathrow under terrorism laws",
-        "Trump kills Tren de Aragua leader in airstrike",
-        "Global strategic oil reserves running low",
-        "Trump announces deal to reopen Strait of Hormuz"
-      ],
-      "deep_dives": [
-        "US-Iran deal and Strait of Hormuz reopening negotiations",
-        "Inevitable EU-China trade collision and European industrial decline",
-        "AI filmmaking at Tribeca: what works and what does not"
-      ]
-    },
-    {
-      "date": "2026-06-15",
-      "headlines_topics": [
-        "US-Iran deal signed, Strait of Hormuz set to reopen",
-        "Markets surge: Brent crude falls 4%, Nikkei jumps 5%",
-        "Trump marks 80th birthday hosting UFC at White House",
-        "Switzerland rejects population cap referendum",
-        "Anthropic in standoff over model access with Trump administration",
-        "Makerfield by-election as national referendum on Labour"
-      ],
-      "deep_dives": [
-        "Iran deal terms and Strait of Hormuz reopening details",
-        "Makerfield by-election and Andy Burnhams rise",
-        "AI cost crisis: subsidised pricing era ending"
-      ]
-    },
-    {
-      "date": "2026-06-16",
-      "headlines_topics": [
-        "Hormuz deal aftermath: markets surge, complications emerge",
-        "G7 summit underway in France",
-        "Anthropic in standoff with Trump administration over model access",
-        "China domestic spending slowdown deepens",
-        "Xbox shuts down Ninja Theory studio",
-        "American carmakers struggle against Chinese EV competition"
-      ],
-      "deep_dives": [
-        "Bank of Japan raises rates to highest since 1995",
-        "Anthropic model shutdown: politics, jailbreak claims, enforcement chaos",
-        "Physicists case for urgent US-China AI governance framework"
-      ]
-    },
-    {
-      "date": "2026-06-17",
-      "headlines_topics": [
-        "G7: European leaders aligning with Trump post-Iran deal",
-        "Russian warship fires warning shots in English Channel",
-        "Oil prices to remain elevated despite Hormuz reopening",
-        "Google rolls out Android 17 to Pixel phones",
-        "Fox acquires Roku, media consolidation accelerating",
-        "Messi equals World Cup all-time scoring record"
-      ],
-      "deep_dives": [
-        "Snap launches $2,195 standalone AR glasses for consumers",
-        "US stock options market entering speculative mania phase",
-        "Trump-Netanyahu falling out over Iran deal and Beirut airstrike"
-      ]
-    },
-    {
       "date": "2026-06-18",
       "headlines_topics": [
         "US-Iran deal formally signed, Hormuz stays open",
@@ -125,7 +29,110 @@
         "Andy Burnham Makerfield landslide and Starmer leadership crisis",
         "Amazon employees disciplined for supporting Seattle data center moratorium"
       ]
+    },
+    {
+      "date": "2026-06-20",
+      "headlines_topics": [
+        "Starmer cabinet mutiny, weekend deadline to resign",
+        "Meloni accuses Trump of pandering to west enemies",
+        "Lebanon weak link in US-Iran deal, Israel plans more attacks",
+        "Bedford train crash kills driver, injures 89",
+        "Morocco beats Scotland, US through to World Cup knockouts"
+      ],
+      "deep_dives": [
+        "AI has granted America vast new power (Economist)",
+        "Cabinet loyalists give Starmer weekend ultimatum (Guardian)",
+        "Companies rein in AI usage as costs strain budgets (FT)"
+      ]
+    },
+    {
+      "date": "2026-06-22",
+      "headlines_topics": [
+        "Starmer announces exit timetable, autumn departure expected",
+        "Meloni publicly breaks with Trump over Iran deal",
+        "Rahm Emanuel says Trump got schooled by Iran",
+        "Oil prices fall as US-Iran talks in Switzerland show progress",
+        "Colombia far-right millionaire De la Espriella wins presidential election",
+        "Putin war machine struggling in drone age per FT"
+      ],
+      "deep_dives": [
+        "Colombia far-right win: De la Espriella, Latin American right wave",
+        "Silicon Valley zombie unicorns: $1trn VC valuation reckoning",
+        "Starmer exit plan: the gap between electoral mandate and political legitimacy"
+      ]
+    },
+    {
+      "date": "2026-06-23",
+      "headlines_topics": [
+        "Starmer resigns, Burnham poised to be UKs seventh PM in ten years",
+        "Brexit tenth anniversary: Britain still counting the cost",
+        "JD Vance leads Iran talks while Trump creates friction",
+        "US temporarily lifts oil sanctions on Iran",
+        "SpaceX sheds $400bn in market value as IPO rally reverses",
+        "Alan Greenspan dies at 100",
+        "France beats Iraq at World Cup",
+        "Patreon Jack Conte defends model against social media",
+        "Steam Machine console reviews",
+        "France beats Iraq at World Cup"
+      ],
+      "deep_dives": [
+        "Burnham succession: Starmer resignation and incoming PM",
+        "Alan Greenspan obituary: maestro or lucky conductor?",
+        "Compute as financial asset: GPU futures and ETFs",
+        "Russia war economy: macroeconomic resilience under sanctions",
+        "UK agricultural labor: Central Asian seasonal workers post-Brexit",
+        "US allies strategic independence: export controls and off-switches"
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "headlines_topics": [
+        "UK transition of power: Burnham and Starmer hold frosty meeting",
+        "Zelenskyy and Trump diplomatic dynamics shift over Ukraine",
+        "Wall Street chipmakers slide on interest rate rise worries",
+        "US lifting of Iranian oil sanctions sparks domestic policy debates",
+        "Meta launches cheaper smart glasses without Ray-Ban branding",
+        "Fitbit Air fitness tracker review: AI health coach approach",
+        "England football draw against Ghana in World Cup group stage",
+        "Burnham-Starmer transition of power",
+        "Hegseth forces out top US army officer in Europe",
+        "US chipmakers lead Wall Street slide",
+        "US waives Iran oil sanctions",
+        "NY primaries and fired admiral runoff",
+        "Meta cheaper smart glasses"
+      ],
+      "deep_dives": [
+        "HMRC Stocks and Shares ISA Cash Interest 22 Percent Tax",
+        "Trump Administration BEAD Broadband Restructuring and Mogul Subsidies",
+        "America Data Centre Backlash and AI Grid Infrastructure Constraints",
+        "Pentagon military leadership purge (Hegseth/Donahue)",
+        "Smartphones and AI remaking rural India",
+        "Why macro trading is hard (Elm Wealth study)"
+      ]
+    },
+    {
+      "date": "2026-06-25",
+      "headlines_topics": [
+        "Andy Burnham Labour leadership challenge",
+        "Trump requests $88B for Iran war prep",
+        "Venezuela back-to-back earthquakes kill 32",
+        "UK politics transition",
+        "US-Iran diplomacy shift",
+        "Venezuela earthquakes kill 32, injure 700",
+        "Scotland vs Brazil World Cup loss, Vinicius decisive",
+        "Burnham plans to move Number 10 operations to Manchester",
+        "US military pilot avoided UK trial after strangling woman in England",
+        "Iran oil sanctions waiver 60-day extension developments"
+      ],
+      "deep_dives": [
+        "AI labs hiring philosophers",
+        "Russia fiscal discipline erosion",
+        "Silicon Valley vs finance spreadsheet culture",
+        "Trump $2B quantum computing investment and industrial policy principles",
+        "Martin Wolf FT essay: rise and fall of US hegemony on 250th anniversary",
+        "Iran oil sanctions waiver economics: who actually benefits"
+      ]
     }
   ],
-  "last_updated": "2026-06-19T07:18:07.624Z"
+  "last_updated": "2026-06-25T07:47:58.424Z"
 }
