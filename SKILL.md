@@ -164,6 +164,7 @@ Create a podcast script with this structure, using `---` on its own line to sepa
 
 **Intro: Headlines Roundup (2-3 minutes)**
 - Brief opening greeting with date (format as "February eighth, twenty twenty-six" to avoid TTS stumbling on "2026")
+- **Same-day rerun: time-of-day label must match the episode title suffix.** Before writing the greeting, compute the label from the actual London hour — the same logic used in step 6 to set the title suffix: before noon → "morning", noon–17:00 → "afternoon", 17:00–22:00 → "evening", after 22:00 → "late edition". Use that exact word in the opening line ("Good morning / afternoon / evening"). Do NOT guess based on whether this feels like a "second run" — the hour is the source of truth for both the script and the title.
 - Scan headlines across the 5 sources, using `isNew: true` as a starting signal for freshness — but apply your own judgement too: a `isNew: true` article can still be a follow-up on yesterday's story (same substance, new URL), and a `isNew: false` article may have a genuinely new angle worth mentioning
 - Skip or omit headlines that cover ground already reported yesterday — whether `isNew: false` by URL or a `isNew: true` follow-up on the same story. If a headline is stale and has no new angle, leave it out entirely
 - On slow news days (weekends, holidays) where many headlines repeat, it's fine to have a shorter roundup — fewer but fresher stories beats padding with yesterday's news
