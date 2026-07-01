@@ -222,6 +222,14 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - Include specific numbers and names (adds credibility)
 - Build narrative tension: setup → development → implication
 
+**TTS pronunciation — expand all abbreviations and symbols before saving the script.** Local TTS engines (MOSS, Kokoro, Qwen) read text literally and will mispronounce shorthand:
+- Currency + unit abbreviations: `£4.7bn` → "four point seven billion pounds"; `$2tn` → "two trillion dollars"; `€500m` → "five hundred million euros"; `4m` → "four million"
+- Standalone suffixes: `bn` → "billion"; `tn` → "trillion"; `m` → "million" — applies whether or not a currency symbol precedes it
+- Currency symbols: `£` → "pounds"; `$` → "dollars"; `€` → "euros"
+- Percentages written as `%` are usually fine, but verify if the engine stumbles
+- Dates: already covered above (spell out month + day + year in words)
+- Acronyms meant to be read as words (NATO, NASA) are fine; letter-by-letter acronyms (GOP, SCOTUS, DNC) should be expanded to their full names for a UK audience anyway
+
 ### 6. Deliver Briefing
 
 #### Podcast Mode (Default)

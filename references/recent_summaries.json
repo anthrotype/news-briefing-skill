@@ -1,90 +1,6 @@
 {
   "summaries": [
     {
-      "date": "2026-06-18",
-      "headlines_topics": [
-        "US-Iran deal formally signed, Hormuz stays open",
-        "G7 diplomatic harmony collapses after one day",
-        "Andy Burnham forming new UK government amid chaos",
-        "England beats Croatia in World Cup opener, Bellingham stars",
-        "Major Oak in Sherwood Forest dies after over 1000 years"
-      ],
-      "deep_dives": [
-        "Berkshire Hathaway identity crisis after Buffetts departure",
-        "Midjourney pivots from AI images to full-body ultrasound scanners",
-        "Britains AI opportunity and what it must do to seize it"
-      ]
-    },
-    {
-      "date": "2026-06-19",
-      "headlines_topics": [
-        "Andy Burnham wins Makerfield by-election decisively, Labour leadership challenge imminent",
-        "Ukraine launches largest-ever drone attack on Moscow, hits major oil refinery",
-        "US-Iran Switzerland talks abruptly called off",
-        "JD Vance clashes with Israel over Iran deal",
-        "Obama presidential library opens in Chicago"
-      ],
-      "deep_dives": [
-        "Ukraine drone war escalation and Moscow strikes",
-        "Andy Burnham Makerfield landslide and Starmer leadership crisis",
-        "Amazon employees disciplined for supporting Seattle data center moratorium"
-      ]
-    },
-    {
-      "date": "2026-06-20",
-      "headlines_topics": [
-        "Starmer cabinet mutiny, weekend deadline to resign",
-        "Meloni accuses Trump of pandering to west enemies",
-        "Lebanon weak link in US-Iran deal, Israel plans more attacks",
-        "Bedford train crash kills driver, injures 89",
-        "Morocco beats Scotland, US through to World Cup knockouts"
-      ],
-      "deep_dives": [
-        "AI has granted America vast new power (Economist)",
-        "Cabinet loyalists give Starmer weekend ultimatum (Guardian)",
-        "Companies rein in AI usage as costs strain budgets (FT)"
-      ]
-    },
-    {
-      "date": "2026-06-22",
-      "headlines_topics": [
-        "Starmer announces exit timetable, autumn departure expected",
-        "Meloni publicly breaks with Trump over Iran deal",
-        "Rahm Emanuel says Trump got schooled by Iran",
-        "Oil prices fall as US-Iran talks in Switzerland show progress",
-        "Colombia far-right millionaire De la Espriella wins presidential election",
-        "Putin war machine struggling in drone age per FT"
-      ],
-      "deep_dives": [
-        "Colombia far-right win: De la Espriella, Latin American right wave",
-        "Silicon Valley zombie unicorns: $1trn VC valuation reckoning",
-        "Starmer exit plan: the gap between electoral mandate and political legitimacy"
-      ]
-    },
-    {
-      "date": "2026-06-23",
-      "headlines_topics": [
-        "Starmer resigns, Burnham poised to be UKs seventh PM in ten years",
-        "Brexit tenth anniversary: Britain still counting the cost",
-        "JD Vance leads Iran talks while Trump creates friction",
-        "US temporarily lifts oil sanctions on Iran",
-        "SpaceX sheds $400bn in market value as IPO rally reverses",
-        "Alan Greenspan dies at 100",
-        "France beats Iraq at World Cup",
-        "Patreon Jack Conte defends model against social media",
-        "Steam Machine console reviews",
-        "France beats Iraq at World Cup"
-      ],
-      "deep_dives": [
-        "Burnham succession: Starmer resignation and incoming PM",
-        "Alan Greenspan obituary: maestro or lucky conductor?",
-        "Compute as financial asset: GPU futures and ETFs",
-        "Russia war economy: macroeconomic resilience under sanctions",
-        "UK agricultural labor: Central Asian seasonal workers post-Brexit",
-        "US allies strategic independence: export controls and off-switches"
-      ]
-    },
-    {
       "date": "2026-06-24",
       "headlines_topics": [
         "UK transition of power: Burnham and Starmer hold frosty meeting",
@@ -132,7 +48,71 @@
         "Martin Wolf FT essay: rise and fall of US hegemony on 250th anniversary",
         "Iran oil sanctions waiver economics: who actually benefits"
       ]
+    },
+    {
+      "date": "2026-06-26",
+      "headlines_topics": [
+        "Attack in Strait of Hormuz halts ship evacuation plans",
+        "Russia reportedly preparing provocations in Baltics or Poland",
+        "Record-breaking heatwave bakes central and southern Europe",
+        "JPMorgan CEO Jamie Dimon promotes potential successors",
+        "Allianz CIO warns bond market is in bubble territory after SpaceX debt sale",
+        "RAM crisis forces Xbox console price hikes and Microsoft Surface downgrades"
+      ],
+      "deep_dives": [
+        "Paris sub-river Seine cooling network expansion (Guardian)",
+        "AI data center demand triggers Apple hardware price hikes (FT)",
+        "Andy Burnham Prime Minister succession and Economist critique (Economist)"
+      ]
+    },
+    {
+      "date": "2026-06-29",
+      "headlines_topics": [
+        "US-Iran Strait of Hormuz standoff, potential deal to suspend attacks",
+        "Andy Burnham 10-year mission, good growth in every postcode devolution plan",
+        "Putin admits Russia fuel shortages after Ukrainian drone strikes on refineries",
+        "Trump billion-dollar Kazakhstan mining deal, sons to profit",
+        "Westminster braced for Miliband brothers saga"
+      ],
+      "deep_dives": [
+        "Erin Brockovich campaign against AI datacenters (Guardian)",
+        "Trump expelling Chinese firms but keeping their solar tech (Economist)",
+        "BIS warns AI exuberance risks investment bust (FT)"
+      ]
+    },
+    {
+      "date": "2026-06-30",
+      "headlines_topics": [
+        "Supreme Court blocks Trump from firing Fed governor Cook (5-4), but allows firing of FTC commissioner (6-3)",
+        "Andy Burnham vows to rewire British state, devolution agenda",
+        "Turkey positioning to profit economically from Iran war",
+        "UK asylum seekers to pay £10,000 towards living costs under new law",
+        "Hong Kong halfway back as financial centre",
+        "AI health and location data ban bill backed by Warren",
+        "World Cup: Morocco beats Netherlands in shootout; Paraguay knocks out Germany in first-ever German shootout loss"
+      ],
+      "deep_dives": [
+        "AI boom and geopolitics rewiring Asia subsea cable routes",
+        "Supreme Court Fed independence: Cook ruling vs FTC ruling paradox",
+        "Rise of vibe lawyering: AI-driven self-representation in courts"
+      ]
+    },
+    {
+      "date": "2026-07-01",
+      "headlines_topics": [
+        "SCOTUS rejects Trump bid to end birthright citizenship",
+        "Trump made at least $2bn in first year back in office via crypto",
+        "Putin formally aligns with United Russia party as war fatigue bites",
+        "Burnham inherits 4.7bn defence spending bill from Starmer",
+        "Allies learning to push back against US pressure (Economist)",
+        "World Cup: France beat Sweden (Mbappe x2), Mexico beat Ecuador"
+      ],
+      "deep_dives": [
+        "Great wealth transfer rattling Wall Street (FT)",
+        "Trump AI regime opaque and unsustainable (Economist)",
+        "Anthropic Fable 5 greenlit to return after export control standoff (Verge)"
+      ]
     }
   ],
-  "last_updated": "2026-06-25T07:47:58.424Z"
+  "last_updated": "2026-07-01T06:17:27.451Z"
 }
