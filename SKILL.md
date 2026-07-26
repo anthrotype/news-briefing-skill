@@ -1,7 +1,7 @@
 ---
 name: news-briefing
 description: Generate daily news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge). Supports both audio (via TTS) and text-only modes.
-args: "[--text-only] [--whatsapp] [--voice moss-marc-filippino|er-marc-filippino|aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift]"
+args: "[--text-only] [--whatsapp] [--voice moss-marc-filippino|er-marc-filippino|aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift|claude-buttery|claude-airy|claude-mellow|claude-glassy|claude-rounded]"
 ---
 
 # News Briefing
@@ -10,17 +10,20 @@ Generate personalized daily news briefings by fetching headlines from 5 major ne
 
 ## Usage
 
-- **Podcast mode (default)**: `/news-briefing` - Generates MP3 via MOSS-TTS cloned Marc Filippino voice (free, local), publishes to private podcast feed
-- **Voice choice**: `/news-briefing --voice aoede-pro` - Uses Gemini Pro model (2x cost, richer expressivity)
-- **Voice choice**: `/news-briefing --voice adam-stone` - Uses ElevenLabs Adam Stone voice instead (1.2x, pricier)
-- **Voice choice**: `/news-briefing --voice chris-brift` - Uses ElevenLabs Chris Brift voice
-- **Voice choice**: `/news-briefing --voice archer` - Uses ElevenLabs Archer voice (younger editorial)
-- **Voice choice**: `/news-briefing --voice emma` - Kokoro bf_emma, British female (free, local Mac Studio)
-- **Voice choice**: `/news-briefing --voice daniel` - Kokoro bf_daniel, British male (free, local Mac Studio)
-- **Voice choice**: `/news-briefing --voice kokoro-aoede` - Kokoro af_aoede, American female (free, local Mac Studio)
-- **Voice choice**: `/news-briefing --voice qwen-chris-brift` - Qwen3-TTS cloned Chris Brift voice (free, local Mac Studio)
-- **WhatsApp mode**: `/news-briefing --whatsapp` - Sends as WhatsApp voice message (legacy behavior)
-- **Text-only mode**: `/news-briefing --text-only` - Saves transcript to file and sends file link (no TTS cost)
+Invoke this skill from the current harness (`/news-briefing` in Claude Code slash-command form, `$news-briefing` or an explicit skill mention in Codex).
+
+- **Podcast mode (default)**: generate an MP3 via MOSS-TTS cloned Marc Filippino voice (free, local), then publish to the private podcast feed
+- **Voice choice**: `--voice aoede-pro` - Uses Gemini Pro model (2x cost, richer expressivity)
+- **Voice choice**: `--voice adam-stone` - Uses ElevenLabs Adam Stone voice instead (1.2x, pricier)
+- **Voice choice**: `--voice chris-brift` - Uses ElevenLabs Chris Brift voice
+- **Voice choice**: `--voice archer` - Uses ElevenLabs Archer voice (younger editorial)
+- **Voice choice**: `--voice emma` - Kokoro bf_emma, British female (free, local Mac Studio)
+- **Voice choice**: `--voice daniel` - Kokoro bf_daniel, British male (free, local Mac Studio)
+- **Voice choice**: `--voice kokoro-aoede` - Kokoro af_aoede, American female (free, local Mac Studio)
+- **Voice choice**: `--voice qwen-chris-brift` - Qwen3-TTS cloned Chris Brift voice (free, local Mac Studio)
+- **Voice choice**: `--voice claude-buttery` (also claude-airy/mellow/glassy/rounded) - Anthropic claude.ai TTS via OAuth (cloud; 16 kHz source so narrower-band than the local 24-48 kHz engines; metering unestablished — usage is logged per synthesis; supports --live)
+- **WhatsApp mode**: `--whatsapp` - Sends as WhatsApp voice message (legacy behavior)
+- **Text-only mode**: `--text-only` - Saves transcript to file and sends file link (no TTS cost)
 
 ## Workflow
 
@@ -234,7 +237,7 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 
 #### Podcast Mode (Default)
 
-Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent and can run as a background task.
+Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent. It may be run in the foreground or via the current harness's managed background-command facility.
 
 1. **Save the script** to a temp file (**no style preamble needed** — the preset handles it):
 
@@ -272,7 +275,7 @@ TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice moss-marc-filippino -
 
 The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
 
-Pass through the `--voice` flag from the user's args. Default is `moss-marc-filippino` if not specified. Use `er-marc-filippino` when the user explicitly asks for ElevenReader (faster, cloud-based, flat-rate Ultra subscription, but no `--live` streaming).
+Pass through the `--voice` flag from the user's args. Default is `moss-marc-filippino` if not specified. Use `er-marc-filippino` when the user explicitly asks for ElevenReader (faster, cloud-based, flat-rate Ultra subscription, but no `--live` streaming). The `claude-*` presets (buttery/airy/mellow/glassy/rounded) are Anthropic claude.ai TTS via OAuth: cloud, `--live` capable, no per-use cost observed so far (metering unestablished; podcast-tts logs usage per synthesis).
 
 **ElevenReader voices** (`er-*` presets): When the voice is an ElevenReader preset, also pass `--keep-read --title "$TITLE"` so the document stays in the ElevenReader library as a secondary consumption channel via their mobile app. ElevenReader is a batch engine (no `--live` streaming), so skip the live URL announcement in step 2. Example:
 
@@ -280,9 +283,13 @@ Pass through the `--voice` flag from the user's args. Default is `moss-marc-fili
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-marc-filippino --keep-read --title "$TITLE" < /tmp/briefing-script.txt)
 ```
 
-**Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Run the command via `Bash` with `run_in_background: true` — the background task notification will automatically wake you up whether the command exits successfully or fails with a nonzero status. After starting it, do only quick prep work that is useful immediately (save transcript to `static/articles/`, prepare publish commands), then **end your turn and trust the harness**. Do not block on `TaskOutput`, do not keep the turn open just to wait, and do not poll segment counts or process status in a loop of individual Bash calls. The notification is the signal; resume publishing or recovery when the harness re-invokes you, or when the user explicitly reports a problem.
+**Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Choose the least fragile execution mode available in the current harness:
 
-The script prints per-chunk progress to stderr: `done in 8.4s | avg 8.1s/chunk | eta ~8m`. If run in background, this output lands in the task output file. Inspect it only after the completion/failure notification or if the user explicitly asks for status.
+- If the harness supports managed background commands with completion notifications, start `podcast-tts` that way, do only quick prep work that is useful immediately (save transcript to `static/articles/`, prepare publish commands), then stop and resume from the completion/failure notification.
+- If the harness exposes a long-running command session, run `podcast-tts` in the foreground/session and wait for it to finish before publishing.
+- If neither is available, start the command under a durable shell wrapper such as `tmux` or `nohup`, redirect stdout/stderr to a known log file, report the live URL and log path, and resume only after the process exits or the user asks for status.
+
+Do not poll segment counts or process status in a loop of individual shell calls. The script prints per-chunk progress to stderr, e.g. `done in 8.4s | avg 8.1s/chunk | eta ~8m`; inspect that output only after completion/failure notification or when the user explicitly asks for status.
 
 4. **Publish to the podcast feed** (with show notes linking to transcript + native SRT transcript):
 
@@ -369,11 +376,11 @@ The show `spotify:show:033dnvdmfbg1F8Ch3wd5sd` ("Daily Briefing") is pre-created
 
 6. **Notify the user**: Just output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). Tag `@Cosimo` for a push notification. Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
-**Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. Use `er-marc-filippino` when the user wants ElevenReader (faster, cloud, no `--live`).
+**Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. Use `er-marc-filippino` when the user wants ElevenReader (faster, cloud, no `--live`); `claude-*` presets are Anthropic claude.ai TTS (cloud, `--live` capable).
 
 #### WhatsApp Mode (--whatsapp)
 
-If the user passed `--whatsapp`, use the `speak` MCP tool instead to send as a voice message:
+If the user passed `--whatsapp`, use the available WhatsApp voice/TTS tool instead to send as a voice message. In WCA, this is the `speak` MCP tool:
 
 ```typescript
 mcp__whatsapp-agent-tools__speak({
@@ -443,6 +450,7 @@ When feedback is received, update `references/preferences.md` immediately:
 
 **Voice delivery (podcast/whatsapp modes):**
 - `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio). Use `er-marc-filippino` for ElevenReader (cloud, faster, no live streaming).
+- `--voice claude-buttery` (or claude-airy/mellow/glassy/rounded): Anthropic claude.ai TTS via OAuth (cloud, `--live` capable, 16 kHz source — narrower-band than local engines; multilingual with no extra flags).
 - `--voice aoede`: Gemini Flash, female British newsreader, cheap
 - `--voice aoede-pro`: Gemini Pro, female British newsreader, 2x cost, richer expressivity
 - `--voice adam-stone`: ElevenLabs, smooth/deep male, 1.2x speed, pricier
