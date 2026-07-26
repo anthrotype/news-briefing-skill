@@ -41,7 +41,7 @@ This file tracks learned preferences from user feedback to improve article selec
 - **Product reviews** (consumer tech reviews, gadget launches, etc.)
 - Celebrity/personality-focused stories
 - Short breaking news without analysis
-- **Subject-matter repetition**: Do not cover the same core company, individual, or developing story (e.g. SpaceX/Musk, a specific geopolitical conflict, or a particular company's ongoing drama) more than once in a 7-day window. The 7-day history check applies to the *substance* of the story, not just the specific article URL. *Exception*: Genuinely historic, fast-moving breaking news of global significance (such as major geopolitical or macroeconomic crises) can be covered if there is a substantial new development, but ordinary corporate news or incremental follow-ups should be skipped.
+- **Subject-matter repetition**: Do not cover the same core company, individual, or developing story (e.g. SpaceX/Musk, a specific geopolitical conflict, or a particular company's ongoing drama) more than once in a 7-day window. The 7-day history check applies to the *substance* of the story, not just the specific article URL. A brief appearance in the previous day's headlines roundup is not equivalent to a deep dive: a genuinely new, substantive development remains eligible for a next-day deep dive. Distinguish a passing mention from prior substantive coverage. *Exception*: Genuinely historic, fast-moving breaking news of global significance (such as major geopolitical or macroeconomic crises) can be covered if there is a substantial new development, but ordinary corporate news or incremental follow-ups should be skipped.
 
 ## Coverage Balance Preferences
 
@@ -50,6 +50,9 @@ This file tracks learned preferences from user feedback to improve article selec
 - Total length: 10-15 minutes
 
 ## Feedback History
+
+### 2026-07-11
+- **Headline mention versus deep dive**: A topic or company briefly mentioned in one day's headlines remains eligible for a deep dive the next day when there is a genuinely new, substantive development. Do not treat a headline mention as seven-day topic coverage; apply the repetition rule to prior deep dives or repeated substantive treatment instead.
 
 ### 2026-06-19
 - **Voice**: Switch from MOSS Jason Palmer to MOSS Marc Filippino (`moss-marc-filippino`) -- this is now the standing default. Skill SKILL.md already says `moss-marc-filippino` is the default; preferences.md was stale.
@@ -104,3 +107,9 @@ This file tracks learned preferences from user feedback to improve article selec
 ### 2026-06-18
 - **Voice**: User requested Marc Filippino via ElevenReader TTS (`er-marc-filippino`) for this session
 - **Spotify**: Skip by default — user rarely listens there, prefers Apple Podcasts. Only upload if user explicitly requests it (`--spotify` flag or direct ask)
+
+### 2026-07-03
+- **Too much UK focus for one episode**: Picked Cambridge/Cambridge innovation clusters (UK-framed), Starmer defence-cuts jobs analysis (UK politics), and Morgan McSweeney's resignation interview (UK politics) — two of three were literally the same Starmer/Burnham transition storyline, and the third leaned UK too.
+- **Broaden the 2026-05-10 diversity rule beyond geopolitical theatre to country/domestic-focus clustering too**: even when stories come from different topic domains (politics, economics, tech) and different sources, three UK-centric deep-dives in one episode is still a variety problem. When multiple strong UK stories are available, prefer developing one of them in the headlines roundup (with a brief deep-dive) rather than using two full deep-dive slots on the same national storyline — leave room for at least one clearly non-UK/non-domestic-political story.
+- **Selection order matters**: choose the 3 deep-dive articles for topic/theme/geography diversity first, independent of whether they connect to each other. Do NOT pick or favor an article because it links up nicely with another for the editorial — that's selection bias toward thematic clustering, which is exactly what this rule is trying to prevent. If a genuine thread happens to emerge naturally across the diversity-first picks (per SKILL.md's existing "bonus, not engineered" guidance), fine, use it in the editorial — but the thread must be a byproduct of good picks, never a selection criterion.
+- **Don't force a cross-article thread in the editorial either**: if diversity-first picks don't share a genuine connection, that's fine and expected — default back to SKILL.md's baseline (one good take on the last/most editorial-worthy deep-dive, no cross-article link). A forced or stretched connection is worse than no connection.
