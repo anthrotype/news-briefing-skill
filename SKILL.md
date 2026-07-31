@@ -233,6 +233,14 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - Dates: already covered above (spell out month + day + year in words)
 - Acronyms meant to be read as words (NATO, NASA) are fine; letter-by-letter acronyms (GOP, SCOTUS, DNC) should be expanded to their full names for a UK audience anyway
 
+**Fish Audio delivery tags (fish-cloud engine only).** Fish Audio S2.1 Cloud processes the whole script in a single request — it does not use `---` separators for chunking. When using `--engine fish-cloud` (or any `fishcloud-*` preset), you must insert delivery tags explicitly in the script text:
+
+- **Section breaks**: replace each `---` separator with `[long-break]` on its own line. This is the most important fix — without it there is no pause between the intro, articles, and editorial.
+- **Intra-section pauses**: add `[break]` at major paragraph transitions within each section (e.g. after the topic setup before the analysis).
+- **Emphasis**: put `[emphasis]` immediately before a key phrase to stress it — e.g. `[emphasis] a hundred and forty-one thousand evaluation runs`.
+- **Tone cues**: use `[chuckling]` at the start of a sentence for dry/wry moments; use `[confident]` for declarative assertions the presenter owns. The canonical S2 forms are `[whispering]` and `[chuckling]`; empirically `[chuckle]` and `[pause]` also work; `[excited]` is flaky.
+- Do NOT insert these tags for other engines (MOSS, Kokoro, Gemini, etc.) — they will be read aloud literally.
+
 ### 6. Deliver Briefing
 
 #### Podcast Mode (Default)
@@ -446,7 +454,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - Write in podcast style even for text-only mode (conversational, engaging)
 - **Article ordering**: place the article most worthy of editorial commentary last; order the other two naturally
 - **Editorial**: take a genuine position on the last article. If a thread connects multiple articles, develop it — but variety in article selection comes first and the editorial adapts, not the other way around. Have a view.
-- **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph
+- **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph. **Exception: fish-cloud engine** — replace `---` with `[long-break]` since fish-cloud is single-request and ignores the separators (see Fish Audio delivery tags above)
 
 **Voice delivery (podcast/whatsapp modes):**
 - `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio). Use `er-marc-filippino` for ElevenReader (cloud, faster, no live streaming).

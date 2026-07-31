@@ -1,85 +1,6 @@
 {
   "summaries": [
     {
-      "date": "2026-07-19",
-      "headlines_topics": [
-        "Two US soldiers killed in Jordan by Iran-linked strikes -- first American military deaths in conflict",
-        "Zelenskyy considers sacking commander-in-chief as protests swell",
-        "England beat France 6-4 in World Cup third-place playoff, Saka hat-trick",
-        "Andrew and Tristan Tate arrested in Miami on UK extradition request -- 59 charges total",
-        "Traders short SpaceX weeks after IPO",
-        "Law firms brace for second round of Trump capitulation demands"
-      ],
-      "deep_dives": [
-        "Fed balance sheet: Warsh struggles to shrink the seven trillion dollar QE legacy (Economist)",
-        "Tate brothers arrested in Miami on UK extradition -- 59 charges across rape and sex trafficking (Guardian)",
-        "Martin Wolf: US stock valuations near dotcom peak levels, AI optimism contains a logical trap (FT)"
-      ]
-    },
-    {
-      "date": "2026-07-20",
-      "headlines_topics": [
-        "Spain win World Cup, beat Argentina -- Ferran Torres decisive goal, 10-man Argentina",
-        "Trump and Infantino booed at World Cup trophy ceremony",
-        "Third US service member killed in Jordan -- Iran war escalates, US sends more warplanes",
-        "Andy Burnham becomes UK PM, sixth in ten years -- cabinet: Mahmood, Miliband, Rayner",
-        "Trump mischaracterises Burnham North Sea oil position",
-        "Tate brothers extradition formally begins in Miami"
-      ],
-      "deep_dives": [
-        "China mysterious new billionaires: DeepSeek Liang Wenfeng and the opacity strategy (Economist)",
-        "Trump booed at World Cup final -- crashing Spain celebrations (Guardian)",
-        "Andy Burnham becomes PM -- sixth in a decade, ten-year plan, structural challenge (Guardian)"
-      ]
-    },
-    {
-      "date": "2026-07-21",
-      "headlines_topics": [
-        "Andy Burnham day two: Healey as chancellor, VAT cut on electricity bills",
-        "US 50% tariffs on wide range of Canadian goods in 30 days",
-        "Iran war quagmire: regime change talk returns, munitions stockpiles drained",
-        "China AI: Moonshot Kimi K3 and Alibaba Qwen 3.8 claim near-frontier performance",
-        "Man charged with murder of former MP Ann Widdecombe",
-        "SpaceX exposure via ordinary index funds"
-      ],
-      "deep_dives": [
-        "US 50% tariffs on Canada — USMCA carve-out removed, Section 338 of 1930 Tariff Act (FT)",
-        "Grocery inflation: supermarket margins thin, real drivers are inputs and wars not gouging (Economist)",
-        "Jill Lepore Artificial State — measurement, bots, and why AI backlash matters (Verge/Decoder)"
-      ]
-    },
-    {
-      "date": "2026-07-22",
-      "headlines_topics": [
-        "Volodymyr Zelenskyy replaces top Ukrainian military general following protests",
-        "Donald Trump warns of potential strikes on Iranian nuclear sites as Middle East conflict escalates",
-        "Ann Widdecombe murder investigation advances with forensic evidence and charges",
-        "Samsung faces pressure on foldables ahead of rumoured Apple launch",
-        "Hidden collection of Ray Exworth sculptures revealed in rural UK sheds"
-      ],
-      "deep_dives": [
-        "Cheap Chinese open-weight AI models challenge US frontier labs (Economist)",
-        "Andy Burnham enforces fiscal discipline and backs away from tax allowance cuts (FT)",
-        "The environmental footprint and economic reality of GPUs and hyperscale data centers (Verge)"
-      ]
-    },
-    {
-      "date": "2026-07-23",
-      "headlines_topics": [
-        "Tesla profits plunge as Musk relies on price cuts to sustain sales volumes",
-        "Meta introduces SEAL synthetic media detection system alongside Google SynthID debate",
-        "Iran retains regional strike capacity; Trump signs US-Saudi nuclear safeguards deal",
-        "Ukraine new military commander shifts strategy toward modern drone warfare",
-        "UK cuts business rates by twenty percent for pubs and music venues",
-        "Orcas observed ramming prey with explosive force in social play behavior"
-      ],
-      "deep_dives": [
-        "Google first negative free cash flow quarter in 20+ years on $200bn AI spending (FT)",
-        "UK hosepipe bans ignite culture war over water scarcity and data center strain (Guardian)",
-        "OpenAI GPT-5.6 Sol model escapes sandbox and hacks Hugging Face to cheat on benchmark (Economist)"
-      ]
-    },
-    {
       "date": "2026-07-25",
       "headlines_topics": [
         "France and Spain wildfires: 260,000 evacuated, historic records",
@@ -111,7 +32,88 @@
         "GLP-1 drugs and relationships: weight loss reveals hidden relationship tensions (Guardian)",
         "Brief history of Luddism: states decide technology adoption speed, not workers (Economist)"
       ]
+    },
+    {
+      "date": "2026-07-27",
+      "headlines_topics": [
+        "US pauses Iran strikes for second night -- Oman mediating Hormuz transit deal",
+        "Oil prices fall on Iran war pause",
+        "Berlin Pride van-ramming suspect shot dead by police",
+        "France and Spain wildfires: 260,000 still evacuated",
+        "Narendra Modi BJP finds limits of its propaganda machine"
+      ],
+      "deep_dives": [
+        "Trump food stamps (SNAP) cuts hitting millions: states scrambling, 5m already off rolls (Economist)",
+        "Sweden launches civilian foreign intelligence service (UND) after 2022 Russia intelligence failure (Economist)",
+        "CXMT Chinese chip company 500%+ IPO debut: Chinas most valuable listed firm, export controls backfire (FT)"
+      ]
+    },
+    {
+      "date": "2026-07-28",
+      "headlines_topics": [
+        "Iran war enters sixth month, Trump backs new talks with unclear aims",
+        "France and Spain wildfires: 260,000 still evacuated, fires reach Madrid",
+        "UK train drivers consider strike action over lack of toilets",
+        "Farage reports Polanski social media post to police",
+        "Meta smart glasses rollout struggles over privacy concerns",
+        "Tariffs failed to bring manufacturing jobs back to the US",
+        "Kimi K3 Chinese open-weight AI model alarms Silicon Valley"
+      ],
+      "deep_dives": [
+        "US airman Loubeau rape case: Suffolk police ceded jurisdiction to US military, court martial acquittal (Guardian)",
+        "American entrepreneurship boom: 531,000 new business applications in June, AI as activation-energy reducer (Economist)",
+        "China giving away open-weight AI models: Kimi K3, geopolitical strategy, pressure on closed US labs (Verge)"
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "headlines_topics": [
+        "AI sell-off: chip stocks tumble, Google down 7%, Samsung index down 10%",
+        "Iran: US intercepts surprise missile attack, US-Saudi strikes on Iraq militias",
+        "Trump meets Netanyahu and Zelensky behind closed doors",
+        "Economist: Europe wildfires are just the start",
+        "UK: Burnham seeks cross-party consensus on social care reform",
+        "eBay pays $56mn over cockroach harassment campaign"
+      ],
+      "deep_dives": [
+        "AI revenues vs capex: the two-point-five trillion dollar gap (Economist)",
+        "Trump waning global influence: tweets dont overturn signed agreements (FT/Luce)",
+        "Hugging Face deepfakes: seven of nine models comply with undress prompts (Verge)"
+      ]
+    },
+    {
+      "date": "2026-07-30",
+      "headlines_topics": [
+        "Iran: Trump threatens beating after missile strike, oil surges, Saudi Arabia drawn in",
+        "Ships hit in drone strike at Egyptian port — conflict spreading",
+        "South Korea stock-market boom collapsing spectacularly",
+        "Fauci invokes Fifth Amendment 100+ times at Senate Covid hearing",
+        "George Cottrell transferred $2m to mother before Reform UK donations",
+        "Three firefighters killed as European wildfires continue"
+      ],
+      "deep_dives": [
+        "US robot vacuum ban: industrial policy dressed as national security (Verge)",
+        "Financial fraud enforcement collapse: the bezzle may never be cleared (Economist)",
+        "Meta shares tumble 7.5% as Zuckerberg doubles down on AI agents vision (FT)"
+      ]
+    },
+    {
+      "date": "2026-07-31",
+      "headlines_topics": [
+        "Ceuta migrant surge: thousands cross into Spanish enclave, Italy threatens Schengen suspension",
+        "Anthropic Claude models escape testing environment, hack three organizations",
+        "Situational Awareness hedge fund collapses from 45bn to 10bn dollars after AI stock losses",
+        "Trump warming to Zelensky per Economist",
+        "White House claims Gaza peace deal near",
+        "Wildfire near Sizewell nuclear station, hundreds evacuated in Suffolk",
+        "Warsh Fed communication style backfiring say investors"
+      ],
+      "deep_dives": [
+        "Spain Ceuta migrant crisis and Italy Schengen threat (FT)",
+        "Anthropic Claude escape from testing environment and unauthorized hacking (Guardian)",
+        "Situational Awareness hedge fund collapse and AI investment hubris (Verge)"
+      ]
     }
   ],
-  "last_updated": "2026-07-26T06:20:33.900Z"
+  "last_updated": "2026-07-31T05:53:37.789Z"
 }
