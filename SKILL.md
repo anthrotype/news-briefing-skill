@@ -157,6 +157,8 @@ If an article still fails after all fallbacks, skip it and pick an alternative f
 
 ### 5. Write Podcast Script
 
+**Before writing anything: read `references/broadcast-style.md` in full.** It defines the register for the entire script — an Economist radio voice (think The Intelligence) — plus a dated list of banned AI-prose patterns. It governs word choice, sentence shape, honorifics, attribution and rhythm. The TTS pronunciation rules later in this section still win on how numbers, dates and currencies are written out. While reading the scraped articles, collect one or two direct quotes per article worth speaking aloud, with named speakers — the style calls for letting people talk in their own words, and quotes can only be gathered now.
+
 **Before writing: decide on article order.**
 
 Article selection is driven by quality and variety first — the editorial doesn't constrain what you pick. Once you have your 3 articles, decide which one most invites commentary: the one with the sharpest implication, the most interesting tension, or the most provocative angle. Place that article last, just before the editorial. The other two go first in whatever order feels natural.
@@ -218,12 +220,9 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 **Total length: 12-17 minutes** (aim for ~1,600-2,100 words at 130-150 words/minute)
 
 **Writing style:**
-- Conversational, not stiff or formal
-- Active voice, present tense where appropriate
-- Write for audio: short sentences, clear transitions
-- Avoid overuse of "however", "moreover" - vary connectors
-- Include specific numbers and names (adds credibility)
+- Governed by `references/broadcast-style.md` (mandatory read, above) — Economist radio register, Orwell rules, honorifics, banned AI-prose patterns
 - Build narrative tension: setup → development → implication
+- Present tense where appropriate
 
 **TTS pronunciation — expand all abbreviations and symbols before saving the script.** Local TTS engines (MOSS, Kokoro, Qwen) read text literally and will mispronounce shorthand:
 - Currency + unit abbreviations: `£4.7bn` → "four point seven billion pounds"; `$2tn` → "two trillion dollars"; `€500m` → "five hundred million euros"; `4m` → "four million"
@@ -449,9 +448,9 @@ When feedback is received, update `references/preferences.md` immediately:
 **Podcast writing:**
 - The headlines section should give a complete picture of the day's news
 - Deep-dive articles should feel like storytelling, not summaries
-- Use transition phrases between sections: "Speaking of...", "Meanwhile...", "This ties into..."
+- Transitions between sections are turns of thought, not signposts — see broadcast-style.md
 - End each article with "why this matters" - connect to bigger trends
-- Write in podcast style even for text-only mode (conversational, engaging)
+- Write in the broadcast-style.md register even for text-only mode
 - **Article ordering**: place the article most worthy of editorial commentary last; order the other two naturally
 - **Editorial**: take a genuine position on the last article. If a thread connects multiple articles, develop it — but variety in article selection comes first and the editorial adapts, not the other way around. Have a view.
 - **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph. **Exception: fish-cloud engine** — replace `---` with `[long-break]` since fish-cloud is single-request and ignores the separators (see Fish Audio delivery tags above)
@@ -491,6 +490,9 @@ TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio 
   }
 ]
 ```
+
+### references/broadcast-style.md
+The script's style bible: Economist radio register distilled (July 2026) from the Economist style-guide plugin (`/Users/Shared/projects/oss/economist-style-guide-plugin`) and The Economist's "How to spot AI writing" corpus study. Read in full before writing the script (step 5). Its banned-patterns section is a dated snapshot of measured LLM tells — refresh it if the models' habits visibly change.
 
 ### references/preferences.md
 Learned preferences from user feedback. Updated after each briefing based on user's response. Tracks:
