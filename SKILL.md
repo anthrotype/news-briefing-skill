@@ -299,11 +299,20 @@ Pass through the `--voice` flag from the user's args. Default is `moss-marc-fili
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-marc-filippino --keep-read --title "$TITLE" < /tmp/briefing-script.txt)
 ```
 
-**Waiting for TTS to complete:** TTS generation typically takes 10-17 minutes. Choose the least fragile execution mode available in the current harness:
+**Fish Audio cloud voices** (`--engine fish-cloud`, `fishcloud-*` presets, or `--voice economist-jason-palmer` etc.): Fish Audio S2.1 sends the entire script in one HTTP request and returns the complete audio when the server finishes — typically 2-3 minutes. Because it is a single-request engine:
+- Skip step 2 — fish-cloud does not support `--live`, so there is no stream URL to announce.
+- Do NOT pass `--live` in the `podcast-tts` command.
+- **Always run in foreground** (not background). The Claude Code harness kills background tasks before a multi-minute HTTP response completes, which silently truncates the file. Use a 600000ms timeout:
 
-- If the harness supports managed background commands with completion notifications, start `podcast-tts` that way, do only quick prep work that is useful immediately (save transcript to `static/articles/`, prepare publish commands), then stop and resume from the completion/failure notification.
-- If the harness exposes a long-running command session, run `podcast-tts` in the foreground/session and wait for it to finish before publishing.
-- If neither is available, start the command under a durable shell wrapper such as `tmux` or `nohup`, redirect stdout/stderr to a known log file, report the live URL and log path, and resume only after the process exits or the user asks for status.
+```bash
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --engine fish-cloud --voice economist-jason-palmer < /tmp/briefing-script.txt)
+```
+
+**Waiting for TTS to complete:** Chunked engines (moss, kokoro, gemini, claude, etc.) typically take 10-17 minutes and support `--live`. Single-request engines (fish-cloud, elevenreader) complete in 2-5 minutes but require foreground execution. Choose the execution mode accordingly:
+
+- **Single-request engines (fish-cloud, elevenreader):** always run in the foreground Bash tool with a 600000ms timeout. Do not use `run_in_background`.
+- **Chunked engines with a managed background facility:** start `podcast-tts` that way, do quick prep work (save transcript to `static/articles/`, prepare publish commands), then resume from the completion notification.
+- **Chunked engines without a managed background facility:** run in the foreground/session, or start under `tmux`/`nohup` with stdout/stderr redirected to a log file.
 
 Do not poll segment counts or process status in a loop of individual shell calls. The script prints per-chunk progress to stderr, e.g. `done in 8.4s | avg 8.1s/chunk | eta ~8m`; inspect that output only after completion/failure notification or when the user explicitly asks for status.
 
