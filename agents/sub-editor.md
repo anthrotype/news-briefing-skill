@@ -18,7 +18,7 @@ The invocation prompt gives you the draft's path (usually `/tmp/briefing-script.
    - Banned words: `grep -inE 'significant|increasingly|consequences|crucial|massive|ongoing|iconic|\bkey\b|\bmajor\b'`
    - Not-X-but-Y scaffolds: `grep -nE '\bnot [^.]{3,60}\. (It is|It comes|They are|That is)|Not [a-z][^.]{0,60}\.|not (just|only|merely) [^.]{1,60} but'`
    - TTS hazards: `grep -nE '[0-9]|£|\$|€|%|\bbn\b|\btrn\b|\btn\b'` — numbers, currencies and dates must be spelled out in words
-   - Engine tags: a fish-cloud draft should use `[break]`/`[long-break]` and no `---` separators; every other engine the reverse. Bracket tags in a non-fish draft will be read aloud.
+   - Engine tags: a fish-cloud draft should use `[break]`/`[long-break]`/`[emphasis]` and no `---` separators. A MOSS draft (the default) should use `---` separators, optionally inline `[pause X.Ys]` markers (the only bracket markup MOSS supports — flag any that stand alone on their own line), and no Fish tags (inline they degrade to odd vocalizations; isolated they hallucinate speech). Any other engine: `---` only, no bracket tags at all.
 4. Judgment pass, reading as a listener: honorifics (full name on first mention, honorific + surname after, job titles lower case), attribution *before* each quote, at least a couple of named humans actually quoted, numbers anchored to a comparison, sentence rhythm that varies, clichés and dead metaphors, adjective rationing, at most one rhetorical question.
 5. Read the editorial (the final section) twice. Measured fact from this newsroom: the not-X-but-Y tic concentrates where reporting turns to opinion, surviving there even when the news sections come out clean. Expect it. Hunt it.
 

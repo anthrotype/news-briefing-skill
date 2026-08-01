@@ -238,7 +238,16 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - **Intra-section pauses**: add `[break]` at major paragraph transitions within each section (e.g. after the topic setup before the analysis).
 - **Emphasis**: put `[emphasis]` immediately before a key phrase to stress it — e.g. `[emphasis] a hundred and forty-one thousand evaluation runs`.
 - **Tone cues**: use `[chuckling]` at the start of a sentence for dry/wry moments; use `[confident]` for declarative assertions the presenter owns. The canonical S2 forms are `[whispering]` and `[chuckling]`; empirically `[chuckle]` and `[pause]` also work; `[excited]` is flaky.
-- Do NOT insert these tags for other engines (MOSS, Kokoro, Gemini, etc.) — they will be read aloud literally.
+- Do NOT insert these tags for other engines. On MOSS they are not read aloud literally, but they misbehave: inline within a sentence they become pauses or odd vocalizations ("[chuckling]" produced a sigh), and isolated on their own line — exactly where the section-break conversion puts them — MOSS hallucinates speech-like noises (observed on the Aug 1 episode re-run). On other engines assume they are read aloud.
+
+**MOSS pause markers (moss/moss-lt engines, the default).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
+
+- Section breaks stay `---` (podcast-tts chunks on them; boundaries give natural pauses). Do not use `[long-break]`/`[break]` with MOSS.
+- `[pause X.Ys]` may be used sparingly for intra-section dramatic beats (e.g. the editorial pivot, or after a punchy standalone sentence), **inline only** — keep it inside a paragraph's text, never alone on its own line (a bracket tag standing alone risks the same hallucination as Fish tags there; inferred from the [break] behavior, not separately tested).
+- MOSS v1.5 has no documented emotion or sound-event tags ([laugh]/[music] belong to MOSS-TTSD, the separate dialogue model). Don't use them.
+- When converting a script between engines: fish→MOSS means `[long-break]`/`[break]` lines → `---`, other Fish tags stripped or replaced with inline `[pause X.Ys]`; MOSS→fish is the reverse per the Fish rules above.
+
+(Operational note: fish-cloud runs on a free API promotion expected to end late August 2026 and may be retired after that — MOSS is the default and the safe long-term target.)
 
 ### 5.5. Sub-Edit the Draft
 
