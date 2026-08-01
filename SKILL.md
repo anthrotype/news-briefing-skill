@@ -242,7 +242,7 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 
 **MOSS pause markers (moss/moss-lt engines, the default).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
 
-- Section breaks stay `---` (podcast-tts chunks on them; boundaries give natural pauses). Do not use `[long-break]`/`[break]` with MOSS.
+- Section breaks stay `---`. MOSS never sees the separator — podcast-tts strips it at chunking and splices silence in at concatenation (1.75s at `---`, 0.7s at paragraph breaks, per `MOSS_GAPS`). Do not use `[long-break]`/`[break]` with MOSS.
 - `[pause X.Ys]` may be used sparingly for intra-section dramatic beats (e.g. the editorial pivot, or after a punchy standalone sentence), **inline only** — keep it inside a paragraph's text, never alone on its own line (a bracket tag standing alone risks the same hallucination as Fish tags there; inferred from the [break] behavior, not separately tested).
 - MOSS v1.5 has no documented emotion or sound-event tags ([laugh]/[music] belong to MOSS-TTSD, the separate dialogue model). Don't use them.
 - When converting a script between engines: fish→MOSS means `[long-break]`/`[break]` lines → `---`, other Fish tags stripped or replaced with inline `[pause X.Ys]`; MOSS→fish is the reverse per the Fish rules above.
