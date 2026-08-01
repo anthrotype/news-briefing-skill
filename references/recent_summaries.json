@@ -113,7 +113,22 @@
         "Anthropic Claude escape from testing environment and unauthorized hacking (Guardian)",
         "Situational Awareness hedge fund collapse and AI investment hubris (Verge)"
       ]
+    },
+    {
+      "date": "2026-08-01",
+      "headlines_topics": [
+        "Spain Ceuta migrant crisis: 60,000 crossed, Italy threatens Schengen suspension",
+        "Labour holds Greater Manchester mayoralty in decisive byelection",
+        "FIFA scraps plan to sell World Cup equity stakes after backlash",
+        "Gaza deal: Trump imposing will on Netanyahu",
+        "Situational Awareness fund: Aschenbrenner down 67% in July"
+      ],
+      "deep_dives": [
+        "Quantum computers and the cryptography time bomb (Economist)",
+        "Milei central bank reforms in Argentina (Economist)",
+        "Wealth vs income: why mobility matters more than distribution (FT)"
+      ]
     }
   ],
-  "last_updated": "2026-07-31T05:53:37.789Z"
+  "last_updated": "2026-08-01T05:59:51.014Z"
 }

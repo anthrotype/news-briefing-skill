@@ -240,13 +240,22 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - **Tone cues**: use `[chuckling]` at the start of a sentence for dry/wry moments; use `[confident]` for declarative assertions the presenter owns. The canonical S2 forms are `[whispering]` and `[chuckling]`; empirically `[chuckle]` and `[pause]` also work; `[excited]` is flaky.
 - Do NOT insert these tags for other engines (MOSS, Kokoro, Gemini, etc.) — they will be read aloud literally.
 
+### 5.5. Sub-Edit the Draft
+
+Save the finished draft to `/tmp/briefing-script.txt`, then hand it to the sub-editor:
+
+- **Claude Code harness**: invoke the Agent tool with subagent_type `briefing-sub-editor` (definition: `agents/sub-editor.md` in this skill, registered via `~/.claude/agents/briefing-sub-editor.md`; runs on Fable). Prompt: the draft's path plus the target TTS engine. Run it synchronously (`run_in_background: false`) — you need the corrections before proceeding.
+- **Fallback** (agent type unavailable — e.g. a session started before the agent was registered — or a non-Claude harness): spawn a general-purpose subagent instructed to first read and follow `agents/sub-editor.md`, passing `model: "fable"` if the harness supports a model override (without it the agent inherits your model). Failing all subagent support, self-review the draft against broadcast-style.md's banned-patterns section, reading the editorial twice.
+
+Apply the corrections you accept by editing `/tmp/briefing-script.txt` in place. You are the author: factual accuracy outranks any style edit, and a correction that changes a fact, figure or quote is wrong by definition — skip it and move on. One pass is enough; don't loop.
+
 ### 6. Deliver Briefing
 
 #### Podcast Mode (Default)
 
 Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent. It may be run in the foreground or via the current harness's managed background-command facility.
 
-1. **Save the script** to a temp file (**no style preamble needed** — the preset handles it):
+1. **Confirm the corrected script** from step 5.5 is at `/tmp/briefing-script.txt` (**no style preamble needed** — the preset handles it). Only if you skipped sub-editing entirely, save it now:
 
 ```bash
 cat > /tmp/briefing-script.txt << 'SCRIPT'
@@ -493,6 +502,9 @@ TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio 
 
 ### references/broadcast-style.md
 The script's style bible: Economist radio register distilled (July 2026) from the Economist style-guide plugin (`/Users/Shared/projects/oss/economist-style-guide-plugin`) and The Economist's "How to spot AI writing" corpus study. Read in full before writing the script (step 5). Its banned-patterns section is a dated snapshot of measured LLM tells — refresh it if the models' habits visibly change.
+
+### agents/sub-editor.md
+Custom subagent definition for the `briefing-sub-editor` (runs on Fable), registered via symlink at `~/.claude/agents/briefing-sub-editor.md`. Proofreads the draft against broadcast-style.md and returns numbered corrections; read-only by design — the author applies the edits. Invoked in step 5.5.
 
 ### references/preferences.md
 Learned preferences from user feedback. Updated after each briefing based on user's response. Tracks:

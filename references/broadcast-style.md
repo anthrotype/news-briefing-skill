@@ -39,6 +39,8 @@ These are the measured fingerprints of LLM prose. The briefing must not have the
 - **Nobody quoted**: bots paraphrase everything; humans let people talk. See House habits — this rule pays off at writing time, when the source articles and their quotes are in hand.
 - **Em-dashes**: still a Claude signature. Prefer commas and full stops; the TTS phrases them better anyway.
 
+Field note, August 1st 2026: on the first script written under these rules, every news section came out clean while the editorial carried five not-X-but-Y scaffolds in four hundred words. The tic returns precisely where reporting turns to opinion. After drafting the editorial, sweep it again for these patterns before saving.
+
 ## Sound and shape (audio-only rules)
 
 - Average sentence twelve to eighteen words, with wide variation around that. After two long sentences, write a short one.
