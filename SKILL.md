@@ -384,11 +384,9 @@ rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
 
 Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
 
-5. **Save to Spotify** (optional — only when user explicitly asks for it or passes `--spotify`):
+5. **Save to Spotify** (default — run every time unless user passes `--no-spotify`):
 
-**Skip by default.** The user primarily listens via Apple Podcasts; Spotify upload is an explicit opt-in.
-
-If the user asks for Spotify, run:
+Run after every briefing:
 
 ```bash
 # Upload to the "Daily Briefing" show on Spotify
@@ -461,7 +459,7 @@ When feedback is received, update `references/preferences.md` immediately:
 ## Tips
 
 **Mode selection:**
-- Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale. Spotify upload is opt-in only (pass `--spotify` or user explicitly requests it)
+- Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale and uploads to Spotify. Pass `--no-spotify` to skip Spotify upload.
 - Use `--whatsapp` for immediate voice message delivery (e.g. when user wants it NOW)
 - Use `--text-only` to skip TTS entirely (fastest, no cost)
 - The `--voice` flag controls TTS: `chris-brift` (ElevenLabs, default), `archer` (younger editorial), `adam-stone` (deeper), or `aoede` (Gemini, free)

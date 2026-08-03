@@ -1,39 +1,6 @@
 {
   "summaries": [
     {
-      "date": "2026-07-25",
-      "headlines_topics": [
-        "France and Spain wildfires: 260,000 evacuated, historic records",
-        "NATO spy intern arrested at Belgium HQ",
-        "UK Chancellor Healey under fiscal pressure as headroom shrinks",
-        "Narendra Modi caves to India Gen Z pressure",
-        "Trump rambles and attacks press at White House Correspondents Dinner",
-        "Trump orders warning signs at Smithsonian museum",
-        "EU investors cooling on old-style European defence firms",
-        "North Sea Rosebank drilling delayed after equipment dropped into sea"
-      ],
-      "deep_dives": [
-        "UK savings rate war: banks and fintechs competing, easy-access up to 5%, regular savings to 8% (Guardian)",
-        "France and Spain unprecedented wildfires: 260,000 evacuated, hottest June on record, Scotland also affected (FT)",
-        "Rise of the self-made billionaire: Economist data shows self-made now exceeds inherited for first time, mobile internet as driver (Economist)"
-      ]
-    },
-    {
-      "date": "2026-07-26",
-      "headlines_topics": [
-        "Iran war at crossroads as Trump holds back from major escalation",
-        "Pentagon controversially lowered official US troop death count in Iran conflict",
-        "Berlin Pride attack: one killed, sixteen injured in van and stabbing attack",
-        "France and Spain wildfire crisis: international help arrives as 260,000 remain evacuated",
-        "China gaining troubling military knowledge from Russia partnership"
-      ],
-      "deep_dives": [
-        "UK pension tapered allowance trap: 600,000+ high earners caught, growing to 714,000 by 2032 (FT)",
-        "GLP-1 drugs and relationships: weight loss reveals hidden relationship tensions (Guardian)",
-        "Brief history of Luddism: states decide technology adoption speed, not workers (Economist)"
-      ]
-    },
-    {
       "date": "2026-07-27",
       "headlines_topics": [
         "US pauses Iran strikes for second night -- Oman mediating Hormuz transit deal",
@@ -128,7 +95,38 @@
         "Milei central bank reforms in Argentina (Economist)",
         "Wealth vs income: why mobility matters more than distribution (FT)"
       ]
+    },
+    {
+      "date": "2026-08-02",
+      "headlines_topics": [
+        "Trump backs down on Iran strikes after Saudi warning",
+        "Moscow restaurant bombing kills three",
+        "US Treasury intervenes in yen market",
+        "EU ministers discuss Ceuta migrant crisis",
+        "Citadel takes stake in Situational Awareness"
+      ],
+      "deep_dives": [
+        "US Treasury yen intervention: first US-Japan coordinated support in 30 years (FT)",
+        "Rubberz and the AI slop question: rap on Billboard Hot 100 amid AI generation suspicion (Verge)",
+        "Economist leader on AI writing: fingerprints fading, humans must edit better (Economist)"
+      ]
+    },
+    {
+      "date": "2026-08-03",
+      "headlines_topics": [
+        "US felony charge for wiping phone at customs",
+        "Kevin Warsh Fed approach to economic slowdown",
+        "Ukraine EU reform condition for accession",
+        "German carmakers flooding job market with managers",
+        "Al Fayed survivors confirmed as human trafficking victims",
+        "India monsoon becoming more erratic"
+      ],
+      "deep_dives": [
+        "Magnificent Seven collapse and AI bubble dynamics (FT)",
+        "America workforce retraining gap and AI displacement (Economist)",
+        "Pippa AI startup and artist royalty payments (Verge)"
+      ]
     }
   ],
-  "last_updated": "2026-08-01T05:59:51.014Z"
+  "last_updated": "2026-08-03T06:12:05.245Z"
 }

@@ -106,7 +106,7 @@ This file tracks learned preferences from user feedback to improve article selec
 - **Voice**: Switch from Qwen Jason Palmer to MOSS Jason Palmer (`moss-jason-palmer`) — MOSS is now the default local TTS engine, user wants consistency
 ### 2026-06-18
 - **Voice**: User requested Marc Filippino via ElevenReader TTS (`er-marc-filippino`) for this session
-- **Spotify**: Skip by default — user rarely listens there, prefers Apple Podcasts. Only upload if user explicitly requests it (`--spotify` flag or direct ask)
+- **Spotify**: Upload by default on every briefing. Pass `--no-spotify` to skip. (Tailscale can be slow on poor connections; Spotify is more reliable for listening on the go.)
 
 ### 2026-07-03
 - **Too much UK focus for one episode**: Picked Cambridge/Cambridge innovation clusters (UK-framed), Starmer defence-cuts jobs analysis (UK politics), and Morgan McSweeney's resignation interview (UK politics) — two of three were literally the same Starmer/Burnham transition storyline, and the third leaned UK too.
