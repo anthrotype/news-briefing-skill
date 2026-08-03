@@ -393,7 +393,9 @@ Run after every briefing:
 COVER_IMG="/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg"
 SPOTIFY_RESULT=$(save-to-spotify --json upload /tmp/briefing-episode.mp3 \
   --title "$TITLE" \
-  --summary "$DESCRIPTION" \
+  --summary "$DESCRIPTION
+
+Transcript: $TRANSCRIPT_URL" \
   --image "$COVER_IMG" \
   --show-id spotify:show:033dnvdmfbg1F8Ch3wd5sd \
   --language en 2>&1)
