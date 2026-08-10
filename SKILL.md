@@ -105,14 +105,22 @@ Autonomously select 3 articles that:
 After selecting your 3 articles, **immediately update** `references/article-history.json` to record them. This prevents re-using the same articles in future briefings.
 
 ```bash
+# Set these variables first — they are reused in the show notes (step 6)
+ARTICLE_1_URL="https://..."
+ARTICLE_1_HEADLINE="..."
+ARTICLE_2_URL="https://..."
+ARTICLE_2_HEADLINE="..."
+ARTICLE_3_URL="https://..."
+ARTICLE_3_HEADLINE="..."
+
 cd /Users/claude/.claude/skills/news-briefing && \
 node scripts/update-article-history.js \
-  "ARTICLE_1_URL" "ARTICLE_1_HEADLINE" \
-  "ARTICLE_2_URL" "ARTICLE_2_HEADLINE" \
-  "ARTICLE_3_URL" "ARTICLE_3_HEADLINE"
+  "$ARTICLE_1_URL" "$ARTICLE_1_HEADLINE" \
+  "$ARTICLE_2_URL" "$ARTICLE_2_HEADLINE" \
+  "$ARTICLE_3_URL" "$ARTICLE_3_HEADLINE"
 ```
 
-**Important:** Replace the URLs and headlines with your actual selections. The script automatically:
+**Important:** Replace the placeholder values with your actual selections. The script automatically:
 - Adds the 3 articles with today's date
 - Prunes articles older than 7 days
 - Updates the timestamp
@@ -364,11 +372,16 @@ TRANSCRIPT_URL="https://cosimos-mac-studio.tail2af01f.ts.net/articles/${SLUG}.md
 groq-transcribe /tmp/briefing-episode.mp3 /tmp/briefing-groq-transcript.md 2>&1 | grep -v "^$"
 # (The .md output is discarded; we use our formatted script for show notes instead)
 
-# Create lightweight show notes with link
+# Create show notes with transcript link and deep-dive article URLs
 cat > /tmp/briefing-shownotes.md << EOF
 ## $TITLE
 
 [Read full transcript]($TRANSCRIPT_URL)
+
+**Deep dives:**
+- $ARTICLE_1_HEADLINE: $ARTICLE_1_URL
+- $ARTICLE_2_HEADLINE: $ARTICLE_2_URL
+- $ARTICLE_3_HEADLINE: $ARTICLE_3_URL
 EOF
 
 podcast-add-episode /tmp/briefing-episode.mp3 "$TITLE" "$DESCRIPTION" \
