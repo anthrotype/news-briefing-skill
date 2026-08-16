@@ -291,11 +291,10 @@ node scripts/update-recent-summaries.js '{
 }'
 ```
 
-2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. The `@Cosimo` tag triggers a push notification:
+2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 6).
 
 ```text
 🔴 Live now (give it ~10s for the first segment): https://cosimos-mac-studio.tail2af01f.ts.net/podcast/live/briefing-episode/
-@Cosimo
 ```
 
 (Use `briefing-episode` as the basename — it must match the basename of the MP3 output path in the next step.)
