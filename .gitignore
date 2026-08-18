@@ -2,3 +2,4 @@ node_modules/
 package-lock.json
 references/article-history.json
 references/last-headlines.json
+references/recent_summaries.json

@@ -191,6 +191,7 @@ For every story you plan to mention in the headlines roundup, verify against the
 2. **What** — does the action or claim you're attributing match what the headline says? Don't invent or strengthen claims.
 3. **Where** — does the geography match? A story about Moscow is not "In the Middle East." A story about London is not "In Europe." Check before using any geographic label.
 4. **Which source** — confirm the article is actually in today's headlines list, not a half-remembered story from earlier in the session.
+5. **Job titles and roles** — if the headline does not state someone's title, do not supply one from memory. Political titles in particular go stale; calling a former official by an old role (or worse, demoting a sitting head of government to a junior post) is the kind of error that makes the briefing untrustworthy. If you are unsure of a person's current role, name them and describe what they announced or did — the action is what matters, not the title.
 
 If you cannot trace a specific claim directly back to a headline URL in the fetched data, **cut it**. The headlines roundup is the one section where factual accuracy is non-negotiable — the listener trusts it to be true. Getting it wrong is not a style problem, it is a failure of the briefing's core function. When in doubt, say less.
 
@@ -257,14 +258,27 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 
 (Operational note: fish-cloud runs on a free API promotion expected to end late August 2026 and may be retired after that — MOSS is the default and the safe long-term target.)
 
-### 5.5. Sub-Edit the Draft
+### 5.5. Sub-Edit and Fact-Check the Draft
 
-Save the finished draft to `/tmp/briefing-script.txt`, then hand it to the sub-editor:
+Save the finished draft to `/tmp/briefing-script.txt`, then launch the sub-editor and fact-checker **in parallel** — they are independent and can both run at the same time:
 
-- **Claude Code harness**: invoke the Agent tool with subagent_type `briefing-sub-editor` (definition: `agents/sub-editor.md` in this skill, registered via `~/.claude/agents/briefing-sub-editor.md`; runs on Fable). Prompt: the draft's path plus the target TTS engine. Run it synchronously (`run_in_background: false`) — you need the corrections before proceeding.
-- **Fallback** (agent type unavailable — e.g. a session started before the agent was registered — or a non-Claude harness): spawn a general-purpose subagent instructed to first read and follow `agents/sub-editor.md`, passing `model: "fable"` if the harness supports a model override (without it the agent inherits your model). Failing all subagent support, self-review the draft against broadcast-style.md's banned-patterns section, reading the editorial twice.
+**Sub-editor** (`briefing-sub-editor`, Fable): checks style only — house register, banned patterns, TTS hazards. Prompt: the draft's path plus the target TTS engine.
 
-Apply the corrections you accept by editing `/tmp/briefing-script.txt` in place. You are the author: factual accuracy outranks any style edit, and a correction that changes a fact, figure or quote is wrong by definition — skip it and move on. One pass is enough; don't loop.
+**Fact-checker** (`briefing-fact-checker`, Sonnet 5): checks factual accuracy against the source articles, headlines JSON, and the web. Prompt example:
+```
+Fact-check the draft at /tmp/briefing-script.txt.
+Sources:
+- /tmp/briefing-script.txt
+- /tmp/article1.md, /tmp/article2.md, /tmp/article3.md (scraped deep-dive articles)
+- /Users/claude/.claude/skills/news-briefing/references/last-headlines.json (today's headlines)
+```
+If the scraped articles have already been deleted, say so in the prompt — the agent will fall back to web search.
+
+**Claude Code harness**: invoke both with the Agent tool, `run_in_background: false` for each, so both complete before you proceed. Named agent types: `briefing-sub-editor` and `briefing-fact-checker` (definitions in `agents/` in this skill, registered via symlinks in `~/.claude/agents/`).
+
+**Fallback** (agent type unavailable, or non-Claude harness): spawn general-purpose subagents instructed to read `agents/sub-editor.md` and `agents/fact-checker.md` respectively.
+
+Apply corrections from both passes before proceeding to TTS. You are the author: accept or reject each finding on merit. Factual corrections from the fact-checker take precedence over style — if a sub-editor suggestion changes a fact, figure or quote, skip it. One round is enough; do not loop.
 
 ### 6. Deliver Briefing
 
