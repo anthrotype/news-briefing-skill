@@ -294,17 +294,6 @@ cat > /tmp/briefing-script.txt << 'SCRIPT'
 SCRIPT
 ```
 
-1.5. **Update recent summaries** with today's headline topics and deep-dive subjects. Write 4-7 short headline bullets (what you actually covered in the intro roundup, not the deep-dives) and 3 deep-dive labels:
-
-```bash
-cd /Users/claude/.claude/skills/news-briefing && \
-node scripts/update-recent-summaries.js '{
-  "date": "YYYY-MM-DD",
-  "headlines_topics": ["topic 1", "topic 2", "..."],
-  "deep_dives": ["Article 1 subject", "Article 2 subject", "Article 3 subject"]
-}'
-```
-
 2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 6).
 
 ```text
@@ -397,6 +386,15 @@ podcast-add-episode /tmp/briefing-episode.mp3 "$TITLE" "$DESCRIPTION" \
     --notes /tmp/briefing-shownotes.md \
     --transcript /tmp/briefing-groq-transcript.srt
 rm -f /tmp/briefing-shownotes.md
+
+# Update recent summaries AFTER podcast-add-episode so the title check above sees no entry
+# on a first-run day (and correctly adds a suffix only on genuine same-day reruns)
+cd /Users/claude/.claude/skills/news-briefing && \
+node scripts/update-recent-summaries.js '{
+  "date": "YYYY-MM-DD",
+  "headlines_topics": ["topic 1", "topic 2", "..."],
+  "deep_dives": ["Article 1 subject", "Article 2 subject", "Article 3 subject"]
+}'
 
 # Clean up all temp files from this run (IMPORTANT: prevents stale files from confusing future sessions)
 rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
