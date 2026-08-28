@@ -241,12 +241,12 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - Dates: already covered above (spell out month + day + year in words)
 - Acronyms meant to be read as words (NATO, NASA) are fine; letter-by-letter acronyms (GOP, SCOTUS, DNC) should be expanded to their full names for a UK audience anyway
 
-**Fish Audio delivery tags (fish-cloud engine only).** Fish Audio S2.1 Cloud processes the whole script in a single request — it does not use `---` separators for chunking. When using `--engine fish-cloud` (or any `fishcloud-*` preset), you must insert delivery tags explicitly in the script text:
+**Fish Audio delivery tags (fish-cloud engine only).** S2.1 has no working pause markup: `[break]`, `[long-break]` and `[pause]` are swallowed without producing any silence (measured and ear-confirmed 2026-08-28 — a tagged clip is no longer than an untagged one, and ten stacked `[long-break]`s degenerate into hallucinated speech). Section pauses come from `podcast-tts` instead, which since 2026-08-28 issues one cloud request per section and splices real silence between them. Write fish-cloud scripts like any other:
 
-- **Section breaks**: replace each `---` separator with `[long-break]` on its own line. This is the most important fix — without it there is no pause between the intro, articles, and editorial.
-- **Intra-section pauses**: add `[break]` at major paragraph transitions within each section (e.g. after the topic setup before the analysis).
+- **Section breaks**: use `---` on its own line, exactly as for every other engine. `podcast-tts` splits there and splices 1.75s of silence. A `[long-break]` alone on a line is also accepted as a section separator, for compatibility with scripts written before this changed — but `---` is the form to write now.
+- **Intra-section pauses**: there is no mechanism for one. A standalone `[break]` is consumed and ignored (Fish's own inter-paragraph gap is already ~0.6s, so isolating a paragraph into its own request would add about a quarter-second and reset the clone conditioning). If a beat genuinely needs to land, make it a `---` section break or write it into the sentence structure.
 - **Emphasis**: put `[emphasis]` immediately before a key phrase to stress it — e.g. `[emphasis] a hundred and forty-one thousand evaluation runs`.
-- **Tone cues**: use `[chuckling]` at the start of a sentence for dry/wry moments; use `[confident]` for declarative assertions the presenter owns. The canonical S2 forms are `[whispering]` and `[chuckling]`; empirically `[chuckle]` and `[pause]` also work; `[excited]` is flaky.
+- **Tone cues**: use `[chuckling]` at the start of a sentence for dry/wry moments; use `[confident]` for declarative assertions the presenter owns. The canonical S2 forms are `[whispering]` and `[chuckling]`; empirically `[chuckle]` also works; `[excited]` is flaky. These emotion and tone tags do work — it is only the pause markers that are inert.
 - Do NOT insert these tags for other engines. On MOSS they are not read aloud literally, but they misbehave: inline within a sentence they become pauses or odd vocalizations ("[chuckling]" produced a sigh), and isolated on their own line — exactly where the section-break conversion puts them — MOSS hallucinates speech-like noises (observed on the Aug 1 episode re-run). On other engines assume they are read aloud.
 
 **MOSS pause markers (moss/moss-lt engines, the default).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
@@ -254,7 +254,7 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - Section breaks stay `---`. MOSS never sees the separator — podcast-tts strips it at chunking and splices silence in at concatenation (1.75s at `---`, 0.7s at paragraph breaks, per `MOSS_GAPS`). Do not use `[long-break]`/`[break]` with MOSS.
 - `[pause X.Ys]` may be used sparingly for intra-section dramatic beats (e.g. the editorial pivot, or after a punchy standalone sentence), **inline only** — keep it inside a paragraph's text, never alone on its own line (a bracket tag standing alone risks the same hallucination as Fish tags there; inferred from the [break] behavior, not separately tested).
 - MOSS v1.5 has no documented emotion or sound-event tags ([laugh]/[music] belong to MOSS-TTSD, the separate dialogue model). Don't use them.
-- When converting a script between engines: fish→MOSS means `[long-break]`/`[break]` lines → `---`, other Fish tags stripped or replaced with inline `[pause X.Ys]`; MOSS→fish is the reverse per the Fish rules above.
+- When converting a script between engines: both fish-cloud and MOSS now use `---` for section breaks, so conversion is only about the inline tags — strip Fish's `[chuckling]`/`[emphasis]`/emotion tags going to MOSS, and drop MOSS's inline `[pause X.Ys]` going to Fish (Fish ignores it).
 
 (Operational note: fish-cloud runs on a free API promotion expected to end late August 2026 and may be retired after that — MOSS is the default and the safe long-term target.)
 
@@ -502,7 +502,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - Write in the broadcast-style.md register even for text-only mode
 - **Article ordering**: place the article most worthy of editorial commentary last; order the other two naturally
 - **Editorial**: take a genuine position on the last article. If a thread connects multiple articles, develop it — but variety in article selection comes first and the editorial adapts, not the other way around. Have a view.
-- **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph. **Exception: fish-cloud engine** — replace `---` with `[long-break]` since fish-cloud is single-request and ignores the separators (see Fish Audio delivery tags above)
+- **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph. This now applies to fish-cloud too — it used to be the exception, but it splits and splices at `---` like the rest (see Fish Audio delivery tags above)
 
 **Voice delivery (podcast/whatsapp modes):**
 - `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio). Use `er-marc-filippino` for ElevenReader (cloud, faster, no live streaming).
