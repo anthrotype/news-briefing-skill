@@ -43,6 +43,8 @@ Work through the draft section by section and list every checkable factual claim
 
 **Priority: the headlines roundup section.** Any specific figure (an age, a count, a dollar amount) that appears in the headlines section but is not traceable to a headline in the JSON is a finding by default — flag it immediately, do not wait for step 3.
 
+**Priority: background political and official roles.** Any claim the script makes about who currently holds a position — Prime Minister, president, minister, CEO, central bank governor — must be verified even if the scraped articles don't challenge it. These facts can be stale or simply wrong without any source article contradicting them. For each such claim, run a targeted WebSearch ("UK prime minister 2026", "who is [person] now") to confirm the role is current. A script asserting someone "is not yet" prime minister or describing a former official as current is a critical error. Catch it here.
+
 ### 3. Verify against source material first
 
 For each claim, check whether it appears verbatim or can be directly derived from the scraped articles or the headlines JSON. Mark each claim:
