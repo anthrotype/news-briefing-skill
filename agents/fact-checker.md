@@ -40,6 +40,7 @@ Work through the draft section by section and list every checkable factual claim
 - **Quotes**: verify the speaker is correctly attributed and the words match the source
 - **Geographic claims**
 - **Comparative anchors**: "highest since 2017", "three summits"
+- **Superlatives**: any claim using "world's largest", "most valuable", "most powerful", "biggest", "first", "only", or similar — these go stale without warning and must be web-verified even when they sound settled
 
 **Priority: the headlines roundup section.** Any specific figure (an age, a count, a dollar amount) that appears in the headlines section but is not traceable to a headline in the JSON is a finding by default — flag it immediately, do not wait for step 3.
 
