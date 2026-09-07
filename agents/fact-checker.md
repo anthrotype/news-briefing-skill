@@ -2,7 +2,7 @@
 name: briefing-fact-checker
 description: Fact-check a drafted news-briefing podcast script against the source articles, today's headlines JSON, and the web. Use after the first draft is saved. Returns a numbered list of confirmed inaccuracies and unverifiable claims for the author to fix. Never edits files.
 tools: Read, WebSearch, Bash, Grep
-model: claude-sonnet-5
+model: sonnet
 effort: medium
 ---
 
