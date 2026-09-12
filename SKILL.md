@@ -56,6 +56,10 @@ This returns annotated JSON with headlines and article URLs from:
 
 Each article has an `isNew` field (`true`/`false`) indicating whether its URL appeared in the previous day's fetch. The script also saves the current headlines to `references/last-headlines.json` for tomorrow's diff. On the very first run (no history yet), all articles are marked `isNew: true`.
 
+Each article also carries a short `id` (`E1`..`E5` Economist, `F1`.. FT, `V1`.. Verge, `G1`.. Guardian, `N1`.. NYT). **From here on, refer to articles by id only and never retype a URL**: step 3.5 resolves ids to URLs from disk, and every later command that needs a URL reads it from `/tmp/briefing-selection.env`. (A 2-bit local model once rewrote `2026/09/10` as `2026-09-10` while retyping Economist URLs, got 404s, and spent an hour hunting a phantom pipeline bug.)
+
+The script closes the news tabs it opened once headlines were retrieved; tabs that were already open are reused and left alone, and a tab whose site returned no headlines stays open for inspection.
+
 **Important:** `isNew` is a mechanical URL-match — use it as a first filter, not the final word. Apply your own reasoning on top:
 - A `isNew: true` article can still cover a story you already reported yesterday (e.g. a follow-up with a new URL on the same tariff threat or the same assassination attempt). Check whether the substance is genuinely different before including it.
 - A `isNew: false` article could have been updated with significantly new information. If it's a major developing story with a clear new angle, it may still be worth mentioning.
@@ -100,55 +104,39 @@ Autonomously select 3 articles that:
 - Medium priority: UK/international politics, financial markets, infrastructure
 - Lower priority: Consumer product reviews, celebrity news, pure entertainment
 
-### 3.5. Update Article History
+### 3.5. Select and Scrape (by id)
 
-After selecting your 3 articles, **immediately update** `references/article-history.json` to record them. This prevents re-using the same articles in future briefings.
+Pass the three ids from the headlines JSON to `select-articles.js`. It resolves them to URLs from `references/last-headlines.json`, refuses any article already used as a deep dive in the last 7 days, writes the selection to `/tmp/briefing-selection.env` (`ARTICLE_N_ID/SITE/HEADLINE/URL/FILE`) and `/tmp/briefing-selection.json`, and scrapes each article with `scrape-remote` into `/tmp/article1.md`, `/tmp/article2.md`, `/tmp/article3.md`:
 
 ```bash
-# Set these variables first — they are reused in the show notes (step 6)
-ARTICLE_1_URL="https://..."
-ARTICLE_1_HEADLINE="..."
-ARTICLE_2_URL="https://..."
-ARTICLE_2_HEADLINE="..."
-ARTICLE_3_URL="https://..."
-ARTICLE_3_HEADLINE="..."
-
 cd /Users/claude/.claude/skills/news-briefing && \
-node scripts/update-article-history.js \
-  "$ARTICLE_1_URL" "$ARTICLE_1_HEADLINE" \
-  "$ARTICLE_2_URL" "$ARTICLE_2_HEADLINE" \
-  "$ARTICLE_3_URL" "$ARTICLE_3_HEADLINE"
+node scripts/select-articles.js E2 F1 V3
 ```
 
-**Important:** Replace the placeholder values with your actual selections. The script automatically:
-- Adds the 3 articles with today's date
-- Prunes articles older than 7 days
-- Updates the timestamp
+Exit 0 means all three scraped. Exit 2 means one or more scrapes failed: the output names the slot and prints the exact fallback commands (see step 4). Exit 1 is bad input (unknown id, duplicate, or an article already in the 7-day history — `--force` overrides the history check only when a reuse is deliberate).
 
-### 4. Scrape Articles
+**Do not type URLs anywhere in this workflow.** When a later command needs one, `source /tmp/briefing-selection.env` and use `$ARTICLE_N_URL`.
 
-For each selected article, scrape the full content using the remote Chrome connection:
+### 4. Fix Failed Scrapes
 
-```bash
-scrape-remote "https://www.ft.com/content/..." > /tmp/article1.md
-scrape-remote "https://www.economist.com/..." > /tmp/article2.md
-scrape-remote "https://www.theverge.com/..." > /tmp/article3.md
-```
+`scrape-remote` uses the remote Chrome session (CDP on port **9224**, Mac Studio Chrome Beta) to bypass paywalls with the user's credentials. Port 9223 is the Crostini legacy fallback — do not use it unless Mac Studio is unreachable.
 
-The `scrape-remote` script uses the remote Chrome session (CDP on port **9224**, Mac Studio Chrome Beta) to bypass paywalls with the user's credentials. Port 9223 is the Crostini legacy fallback — do not use it unless Mac Studio is unreachable.
+If `select-articles.js` reported a failed slot, work through these in order, always taking the URL from the env file:
 
-**Retry on failure:** If `scrape-remote` fails or returns empty/bot-challenge content (very short output, "just a moment", "verifying you are human"), restart the **Mac Studio** browser and retry:
+**Retry on failure:** If the scrape failed or returned empty/bot-challenge content (very short output, "just a moment", "verifying you are human"), restart the **Mac Studio** browser and retry:
 
 ```bash
+source /tmp/briefing-selection.env
 mac-chrome-restart
 sleep 5
-scrape-remote "https://..." > /tmp/article1.md
+scrape-remote "$ARTICLE_2_URL" > /tmp/article2.md
 ```
 
 **Snapshot fallback:** If `scrape-remote` still fails after retry (especially for interactive/JS-heavy pages like Economist `/interactive/` articles), use the accessibility tree scraper:
 
 ```bash
-scrape-snapshot "https://..." > /tmp/article1.md
+source /tmp/briefing-selection.env
+scrape-snapshot "$ARTICLE_2_URL" > /tmp/article2.md
 ```
 
 This uses `agent-browser` to render the page and extract text from the accessibility tree. The output may contain chart labels and data annotations mixed in with article text — that's OK, the LLM will handle cleanup when writing the podcast script. For particularly noisy output, you can also capture a PDF for visual reference:
@@ -161,7 +149,17 @@ Then read the PDF yourself to understand the article's visual layout and disting
 
 **DataDome block (NYT and others):** If `scrape-remote` exits with the message "Blocked by DataDome bot protection", do **not** retry — retrying won't help. Skip immediately and pick the next best candidate from the headlines list. NYT is currently unreliable due to DataDome; prefer FT, Economist, Guardian, or Verge for deep-dive articles.
 
-If an article still fails after all fallbacks, skip it and pick an alternative from the headlines list. Do not block the entire briefing on one failed scrape.
+If an article still fails after all fallbacks, swap it: re-run `select-articles.js` with a different id in that slot (the other two are re-scraped too, which is cheap). Do not block the entire briefing on one failed scrape.
+
+### 4.5. Record the Selection
+
+Once all three `/tmp/articleN.md` files exist, record the deep dives in `references/article-history.json` so future briefings don't reuse them. The script reads `/tmp/briefing-selection.json`; it takes no arguments:
+
+```bash
+cd /Users/claude/.claude/skills/news-briefing && node scripts/update-article-history.js
+```
+
+It adds the 3 articles with today's date, prunes entries older than 7 days and updates the timestamp. Run it after the swaps are settled, not before — otherwise a swapped-out article gets recorded as used.
 
 ### 5. Write Podcast Script
 
@@ -372,7 +370,9 @@ TRANSCRIPT_URL="https://cosimos-mac-studio.tail2af01f.ts.net/articles/${SLUG}.md
 groq-transcribe /tmp/briefing-episode.mp3 /tmp/briefing-groq-transcript.md 2>&1 | grep -v "^$"
 # (The .md output is discarded; we use our formatted script for show notes instead)
 
-# Create show notes with transcript link and deep-dive article URLs
+# Create show notes with transcript link and deep-dive article URLs.
+# The ARTICLE_N_* variables come from select-articles.js (step 3.5) — never retype them.
+source /tmp/briefing-selection.env
 cat > /tmp/briefing-shownotes.md << EOF
 ## $TITLE
 
@@ -401,7 +401,8 @@ node scripts/update-recent-summaries.js '{
 # Clean up all temp files from this run (IMPORTANT: prevents stale files from confusing future sessions)
 rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
       /tmp/briefing-groq-transcript.md /tmp/briefing-groq-transcript.srt \
-      /tmp/article1.md /tmp/article2.md /tmp/article3.md
+      /tmp/article1.md /tmp/article2.md /tmp/article3.md \
+      /tmp/briefing-selection.env /tmp/briefing-selection.json
 ```
 
 Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
@@ -524,7 +525,7 @@ When feedback is received, update `references/preferences.md` immediately:
 ## Resources
 
 ### scripts/get-news-with-urls.ts
-TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio Chrome Beta), refreshes all 5 news tabs, and extracts headlines with article URLs. Returns JSON array with structure:
+TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio Chrome Beta), opens or refreshes the 5 news homepages, extracts headlines with article URLs, then closes the tabs it opened for every site whose headlines were retrieved (pre-existing tabs are reused and left open). Piped through `save-and-diff-headlines.js`, which adds the `id` and `isNew` fields. Returns JSON array with structure:
 ```json
 [
   {
@@ -532,13 +533,21 @@ TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio 
     "pageUrl": "https://www.ft.com/",
     "articles": [
       {
+        "id": "F1",
         "headline": "...",
-        "url": "https://www.ft.com/content/..."
+        "url": "https://www.ft.com/content/...",
+        "isNew": true
       }
     ]
   }
 ]
 ```
+
+### scripts/select-articles.js
+`node scripts/select-articles.js E2 F1 V3` — resolves three article ids against `references/last-headlines.json`, rejects ids already in the 7-day history (`--force` to override), writes `/tmp/briefing-selection.env` and `/tmp/briefing-selection.json`, and scrapes each article to `/tmp/articleN.md` with `scrape-remote` (`--no-scrape` to only write the selection). Exit 0 all scraped, 2 some scrape failed (fallback commands printed), 1 bad input. Exists so that no URL is ever retyped by the model.
+
+### scripts/update-article-history.js
+No arguments: records the three articles from `/tmp/briefing-selection.json` in `article-history.json` with today's date and prunes entries older than 7 days.
 
 ### references/broadcast-style.md
 The script's style bible: Economist radio register distilled (July 2026) from the Economist style-guide plugin (`/Users/Shared/projects/oss/economist-style-guide-plugin`) and The Economist's "How to spot AI writing" corpus study. Read in full before writing the script (step 5). Its banned-patterns section is a dated snapshot of measured LLM tells — refresh it if the models' habits visibly change.
@@ -571,4 +580,4 @@ Tracks articles used in the past 7 days to prevent repetition. Structure:
 }
 ```
 
-**CRITICAL:** Always check this file before selecting articles and update it immediately after selection. Articles older than 7 days are automatically pruned.
+**CRITICAL:** Always check this file before selecting articles (`select-articles.js` also enforces it) and update it via `update-article-history.js` once the scrapes are settled (step 4.5). Articles older than 7 days are automatically pruned.

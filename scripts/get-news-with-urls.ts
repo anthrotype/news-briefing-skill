@@ -30,9 +30,15 @@ const NEWS_SITES: NewsSite[] = [
   { name: "New York Times", url: "https://www.nytimes.com/international", urlPattern: "nytimes.com/international" },
 ];
 
-async function ensureTabsOpen(browser: any): Promise<void> {
+/**
+ * Make sure one tab per news site is open and on its homepage.
+ * Returns the tabs THIS run opened (site name -> page); pre-existing tabs
+ * are reused and left alone.
+ */
+async function ensureTabsOpen(browser: any): Promise<Map<string, any>> {
   const contexts = browser.contexts();
   const pagesBySite = new Map<string, any>();
+  const opened = new Map<string, any>();
 
   for (const context of contexts) {
     for (const page of context.pages()) {
@@ -74,9 +80,35 @@ async function ensureTabsOpen(browser: any): Promise<void> {
       const context = contexts[0];
       if (context) {
         const page = await context.newPage();
-        await page.goto(site.url, { waitUntil: "domcontentloaded", timeout: 30000 });
-        await page.waitForTimeout(2000);
+        opened.set(site.name, page);
+        try {
+          await page.goto(site.url, { waitUntil: "domcontentloaded", timeout: 30000 });
+          await page.waitForTimeout(2000);
+        } catch (err) {
+          console.error(`  Warning: Failed to load ${site.name}, continuing anyway`);
+        }
       }
+    }
+  }
+  return opened;
+}
+
+/**
+ * Close the tabs this run opened, but only for sites whose headlines were
+ * retrieved; a tab for a site that yielded nothing stays open for inspection.
+ */
+async function closeOpenedTabs(opened: Map<string, any>, results: NewsHeadlines[]): Promise<void> {
+  for (const [siteName, page] of opened) {
+    const result = results.find((r) => r.site === siteName);
+    if (result && result.articles.length > 0) {
+      try {
+        await page.close();
+        console.error(`Closed ${siteName} tab`);
+      } catch (err) {
+        console.error(`  Warning: Failed to close ${siteName} tab`);
+      }
+    } else {
+      console.error(`Leaving ${siteName} tab open (no headlines retrieved)`);
     }
   }
 }
@@ -85,7 +117,7 @@ async function extractHeadlines(): Promise<NewsHeadlines[]> {
   const cdpPort = process.env.CDP_PORT || "9224";
   const browser = await chromium.connectOverCDP(`http://localhost:${cdpPort}`);
 
-  await ensureTabsOpen(browser);
+  const opened = await ensureTabsOpen(browser);
 
   const contexts = browser.contexts();
   const results: NewsHeadlines[] = [];
@@ -212,6 +244,7 @@ async function extractHeadlines(): Promise<NewsHeadlines[]> {
     }
   }
 
+  await closeOpenedTabs(opened, results);
   await browser.close();
 
   return results;
