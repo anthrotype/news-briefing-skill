@@ -147,7 +147,7 @@ agent-browser pdf /tmp/article1-layout.pdf
 
 Then read the PDF yourself to understand the article's visual layout and distinguish body text from chart noise.
 
-**DataDome block (NYT and others):** If `scrape-remote` exits with the message "Blocked by DataDome bot protection", do **not** retry — retrying won't help. Skip immediately and pick the next best candidate from the headlines list. NYT is currently unreliable due to DataDome; prefer FT, Economist, Guardian, or Verge for deep-dive articles.
+**DataDome block (NYT and others):** If `scrape-remote` exits with the message "Blocked by DataDome bot protection", do **not** retry — retrying won't help. Skip immediately and pick the next best candidate from the headlines list. NYT scraping is intermittent rather than categorically broken (deep-dive scrapes succeeded on 2026-09-10 and 2026-09-13), so do not pre-judge an NYT candidate out of a slot — but a genuine block is terminal for that article.
 
 If an article still fails after all fallbacks, swap it: re-run `select-articles.js` with a different id in that slot (the other two are re-scraped too, which is cheap). Do not block the entire briefing on one failed scrape.
 
