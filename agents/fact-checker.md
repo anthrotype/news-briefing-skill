@@ -20,14 +20,14 @@ If any source file is missing or unreadable, note it and work with what you have
 Up to three web-search tools may be present; which one to use depends on the model you are running on.
 
 - `WebSearch` is Anthropic's server-side tool. It works on Claude models and is inert on everything else.
-- `mcp__brave_search__brave_web_search` is the Brave Search API. It is configured only on non-Claude workspaces (OpenRouter, Grok, local Qwen/oMLX). It is metered, so keep queries lean.
-- `mcp__whatsapp-agent-tools__GoogleSearch` is a Gemini-grounded search. It costs a Gemini API call per query, and returns an error telling you to use `WebSearch` if you call it on a Claude model.
+- `mcp__whatsapp-agent-tools__GoogleSearch` is a Gemini-grounded search that runs on the Antigravity subscription quota. Do not pass its `model` argument: a model name without the `ag-` prefix bills the Gemini API key instead. It returns an error telling you to use `WebSearch` if you call it on a Claude model.
+- `mcp__brave_search__brave_web_search` is the Brave Search API. It is configured only on non-Claude workspaces (OpenRouter, Grok, local Qwen/oMLX). It is metered per query, so keep queries lean.
 
 Pick in this order, taking the first that is in your tool list and works:
 
 1. On a Claude model: `WebSearch`.
-2. On any other model: `brave_web_search`.
-3. `GoogleSearch`, only if the tool above is missing, errors, or returns nothing usable.
+2. On any other model: `GoogleSearch`.
+3. `brave_web_search`, only if the tool above is missing, errors, or returns nothing usable.
 
 Once one works, use it for the rest of the run. Do not run the same query through two tools. Wherever this document says "web search", it means whichever tool is working for you.
 

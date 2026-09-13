@@ -278,7 +278,7 @@ If the scraped articles have already been deleted, say so in the prompt — the 
 
 Apply corrections from both passes before proceeding to TTS. You are the author: accept or reject each finding on merit. Factual corrections from the fact-checker take precedence over style — if a sub-editor suggestion changes a fact, figure or quote, skip it. One round is enough; do not loop.
 
-**When the fact-checker flags a claim as "NOT IN SOURCES" or "UNVERIFIABLE"**: do not simply cut the claim — search the web first to verify or correct it (WebSearch on Claude models, Brave `brave_web_search` on others, GoogleSearch only as a fallback). A figure or fact that isn't in the scraped articles may still be accurate and worth keeping with the right number. Only cut if search also fails to confirm it.
+**When the fact-checker flags a claim as "NOT IN SOURCES" or "UNVERIFIABLE"**: do not simply cut the claim — search the web first to verify or correct it (WebSearch on Claude models, GoogleSearch on others, Brave `brave_web_search` only as a fallback). A figure or fact that isn't in the scraped articles may still be accurate and worth keeping with the right number. Only cut if search also fails to confirm it.
 
 ### 6. Deliver Briefing
 
