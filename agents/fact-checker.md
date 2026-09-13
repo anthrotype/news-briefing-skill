@@ -1,7 +1,7 @@
 ---
 name: briefing-fact-checker
 description: Fact-check a drafted news-briefing podcast script against the source articles, today's headlines JSON, and the web. Use after the first draft is saved. Returns a numbered list of confirmed inaccuracies and unverifiable claims for the author to fix. Never edits files.
-tools: Read, WebSearch, mcp__whatsapp-agent-tools__GoogleSearch, Bash, Grep
+tools: Read, WebSearch, mcp__brave_search__brave_web_search, mcp__whatsapp-agent-tools__GoogleSearch, Bash, Grep
 model: sonnet
 effort: medium
 ---
@@ -17,12 +17,19 @@ If any source file is missing or unreadable, note it and work with what you have
 
 ## Web search tools
 
-Two web-search tools may be present; which one works depends on the model you are running on.
+Up to three web-search tools may be present; which one to use depends on the model you are running on.
 
 - `WebSearch` is Anthropic's server-side tool. It works on Claude models and is inert on everything else.
-- `mcp__whatsapp-agent-tools__GoogleSearch` is a Gemini-grounded search. It is registered only for Gemini and OpenRouter models, and returns an error telling you to use `WebSearch` if you call it on a Claude model.
+- `mcp__brave_search__brave_web_search` is the Brave Search API. It is configured only on non-Claude workspaces (OpenRouter, Grok, local Qwen/oMLX). It is metered, so keep queries lean.
+- `mcp__whatsapp-agent-tools__GoogleSearch` is a Gemini-grounded search. It costs a Gemini API call per query, and returns an error telling you to use `WebSearch` if you call it on a Claude model.
 
-Try `WebSearch` first. If it is missing from your tool list, errors, or returns nothing usable, switch to `GoogleSearch` and use it for the rest of the run. Do not run the same query through both — pick the one that works and stay on it. Wherever this document says "web search", it means whichever of the two is working for you.
+Pick in this order, taking the first that is in your tool list and works:
+
+1. On a Claude model: `WebSearch`.
+2. On any other model: `brave_web_search`.
+3. `GoogleSearch`, only if the tool above is missing, errors, or returns nothing usable.
+
+Once one works, use it for the rest of the run. Do not run the same query through two tools. Wherever this document says "web search", it means whichever tool is working for you.
 
 If both fail, you still have `Bash`: `scrape-md <url>` fetches a page as clean markdown, which is enough to check a claim against a URL you already have (for example one from the headlines JSON). Say so in your verdict if you were reduced to this — it means open-web claims could not be checked.
 
