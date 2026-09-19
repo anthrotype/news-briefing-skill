@@ -1,7 +1,7 @@
 ---
 name: briefing-fact-checker
 description: Fact-check a drafted news-briefing podcast script against the source articles, today's headlines JSON, and the web. Use after the first draft is saved. Returns a numbered list of confirmed inaccuracies and unverifiable claims for the author to fix. Never edits files.
-tools: Read, WebSearch, mcp__brave_search__brave_web_search, mcp__whatsapp-agent-tools__GoogleSearch, Bash, Grep
+tools: Read, WebSearch, mcp__brave_search__brave_web_search, mcp__brave_search__brave_llm_context, mcp__whatsapp-agent-tools__GoogleSearch, Bash, Grep
 model: sonnet
 effort: medium
 ---
@@ -17,7 +17,7 @@ If any source file is missing or unreadable, note it and work with what you have
 
 ## Web search tools
 
-For web search, use your usual search tool.
+For web search, follow the tool order in `CLAUDE.md` (`Known Issues → Web search`), skipping any tool that is not in your list.
 
 If no search tool works, you still have `Bash`: `scrape-md <url>` fetches a page as clean markdown, which is enough to check a claim against a URL you already have (for example one from the headlines JSON). Say so in your verdict if you were reduced to this — it means open-web claims could not be checked.
 
