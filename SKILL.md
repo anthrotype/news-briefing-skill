@@ -68,17 +68,14 @@ The script closes the news tabs it opened once headlines were retrieved; tabs th
 
 Read `references/preferences.md` to understand learned topic interests and article selection patterns. Use this to inform your choices in the next step.
 
-### 2.5. Check Article History, Recent Summaries and the Monthly Analysis
+### 2.5. Check Article History and Recent Summaries
 
-Run these reads in parallel:
+Run both checks in parallel:
 
 ```bash
 cat /Users/claude/.claude/skills/news-briefing/references/article-history.json
 cat /Users/claude/.claude/skills/news-briefing/references/recent_summaries.json
-ls /Users/claude/.claude/skills/news-briefing/references/briefing-analysis-*.md | sort | tail -1
 ```
-
-Then read the newest `briefing-analysis-<start>-to-<end>.md` report, at least Sections 1 and 2 (executive summary and recurring themes). The `monthly-briefing-analysis` cron job writes one on the 23rd of each month from the past month's briefings. It gives the long view that `recent_summaries.json` (7 days) lacks: which threads have run for weeks, how they have moved, and the key dates and figures along the way. Days after the report's end date are covered by `recent_summaries.json`.
 
 **Article history** (`article-history.json`): lists every article URL used as a deep-dive in the past 7 days. Do NOT re-select any article that appears here.
 
@@ -87,7 +84,7 @@ Then read the newest `briefing-analysis-<start>-to-<end>.md` report, at least Se
 - Spot thematic drift — if the past few deep-dives have all been geopolitics or all been tech, weight today's picks toward variety
 - Notice developing threads worth brief callback ("as we covered earlier this week...")
 
-**Monthly analysis** (newest `briefing-analysis-*.md`): use it in step 5 to place today's news in its longer arc (see "Long view" there). It does not change the selection rules above.
+Do **not** read the monthly `briefing-analysis-*.md` reports yet. They come in step 5, after the stories are chosen, so the month's familiar themes cannot pull the selection toward them.
 
 **Same-day rerun detection:** If today's date already has an entry in `recent_summaries.json`, another agent has already run the briefing today. This is expected and fine — treat it like any other rerun:
 - The `headlines_topics` and `deep_dives` arrays in today's entry show what the earlier briefing covered. Treat these exactly like yesterday's topics when deciding what to skip or mention lightly.
@@ -171,7 +168,15 @@ It adds the 3 articles with today's date, prunes entries older than 7 days and u
 
 **Before writing anything: read `references/broadcast-style.md` in full.** It defines the register for the entire script — an Economist radio voice (think The Intelligence) — plus a dated list of banned AI-prose patterns. It governs word choice, sentence shape, honorifics, attribution and rhythm. The TTS pronunciation rules later in this section still win on how numbers, dates and currencies are written out. While reading the scraped articles, collect one or two direct quotes per article worth speaking aloud, with named speakers — the style calls for letting people talk in their own words, and quotes can only be gathered now.
 
-**Long view.** When a headline or deep dive continues a thread from the monthly analysis, give it one or two sentences of context from that arc. Examples: "the fourth disclosure of an AI agent escaping its test since July", or "Brent has not been this high since the Red Sea front opened in September". Use this to show where a story stands, not to retell it: the callback must be shorter than the news it frames, and at most one per story. Skip it when the connection is loose. The report is our own summary of past briefings, not a primary source. Attribute a date or figure taken from it ("as we reported in August"), or check it against today's articles or the web before stating it as fact. The fact-checker receives the report path (step 5.5) and will flag claims that match neither.
+**Long view.** Only after the three deep dives are recorded (step 4.5) and you have listed the headline stories for the roundup, read the newest monthly analysis:
+
+```bash
+ls /Users/claude/.claude/skills/news-briefing/references/briefing-analysis-*.md | sort | tail -1
+```
+
+Read at least Sections 1 and 2 (executive summary and recurring themes). The `monthly-briefing-analysis` cron job writes one on the 23rd of each month; days after its end date are covered by `recent_summaries.json`. The report must not change either list: do not add, drop or promote a story because it continues a thread the report ranks highly. Novelty is chosen first, and context is added afterwards.
+
+When a headline or deep dive continues a thread from the monthly analysis, give it one or two sentences of context from that arc. Examples: "the fourth disclosure of an AI agent escaping its test since July", or "Brent has not been this high since the Red Sea front opened in September". Use this to show where a story stands, not to retell it: the callback must be shorter than the news it frames, and at most one per story. Skip it when the connection is loose. The report is our own summary of past briefings, not a primary source. Attribute a date or figure taken from it ("as we reported in August"), or check it against today's articles or the web before stating it as fact. The fact-checker receives the report path (step 5.5) and will flag claims that match neither.
 
 **Before writing: decide on article order.**
 
@@ -565,7 +570,7 @@ The script's style bible: Economist radio register distilled (July 2026) from th
 Custom subagent definition for the `briefing-sub-editor` (runs on Fable), registered via symlink at `~/.claude/agents/briefing-sub-editor.md`. Proofreads the draft against broadcast-style.md and returns numbered corrections; read-only by design — the author applies the edits. Invoked in step 5.5.
 
 ### references/briefing-analysis-*.md
-Monthly thematic reports on the past month's briefings (themes ranked by frequency, how each developed, key dates and figures). Written on the 23rd by the `monthly-briefing-analysis` cron job (`/Users/Shared/projects/scripts/monthly-briefing-analysis`). Generated files, not tracked in git. Read the newest in step 2.5 and use it for long-view context in step 5.
+Monthly thematic reports on the past month's briefings (themes ranked by frequency, how each developed, key dates and figures). Written on the 23rd by the `monthly-briefing-analysis` cron job (`/Users/Shared/projects/scripts/monthly-briefing-analysis`). Generated files, not tracked in git. Read the newest in step 5, only after the deep dives and headline stories are chosen, and use it for context only.
 
 ### references/preferences.md
 Learned preferences from user feedback. Updated after each briefing based on user's response. Tracks:
