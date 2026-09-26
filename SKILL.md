@@ -97,6 +97,7 @@ Autonomously select 3 articles that:
 - Span different topics when possible (avoid 3 articles on same story)
 - Come from different sources when possible (prefer variety)
 - **Prefer `isNew: true` articles** — articles marked `isNew: false` were already in yesterday's fetch and should only be picked if they are clearly the best available option and represent a major ongoing story
+- **Never repeat a recent deep-dive subject.** The 7-day URL check only catches the same article; a different article on the same story passes it. Compare each candidate against every `deep_dives` entry in `recent_summaries.json` (the whole file, not just yesterday). If the story matches one, skip it unless it has moved on substantially (a new finding, a new party, a decision, a reversal). If you still pick it, cover only what is new, and open with a short callback such as "we covered this last Friday; what's new is…". Do not retell the background.
 - **On a same-day rerun:** avoid the topics and deep-dive subjects listed in today's existing `recent_summaries` entry. Treat them the same as yesterday's coverage — don't repeat, or if a story is unavoidable, approach it from a clearly different angle.
 
 **Selection criteria:**
