@@ -436,10 +436,14 @@ Transcript: $TRANSCRIPT_URL" \
   --image "$COVER_IMG" \
   --show-id spotify:show:033dnvdmfbg1F8Ch3wd5sd \
   --language en 2>&1)
-SPOTIFY_URI=$(echo "$SPOTIFY_RESULT" | jq -r '.episode_uri // empty')
+# Parse line by line: the CLI can print non-JSON lines (e.g. a <claude-code-hint .../> tag)
+# alongside the JSON, and plain `jq` aborts on the first one. `fromjson?` skips them.
+SPOTIFY_URI=$(echo "$SPOTIFY_RESULT" | jq -rR 'fromjson? | .episode_uri // empty')
 if [ -n "$SPOTIFY_URI" ]; then
   SPOTIFY_EP_ID=$(echo "$SPOTIFY_URI" | sed 's/spotify:episode://')
-  save-to-spotify --json episodes status "$SPOTIFY_EP_ID" --wait 2>&1 | jq -r '.readiness'
+  save-to-spotify --json episodes status "$SPOTIFY_EP_ID" --wait 2>&1 | jq -rR 'fromjson? | .readiness // empty'
+else
+  echo "Spotify upload failed: $SPOTIFY_RESULT"
 fi
 ```
 
