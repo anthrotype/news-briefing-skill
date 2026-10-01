@@ -308,7 +308,7 @@ cat > /tmp/briefing-script.txt << 'SCRIPT'
 SCRIPT
 ```
 
-2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 6).
+2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 7).
 
 ```text
 🔴 Live now (give it ~10s for the first segment): https://cosimos-mac-studio.tail2af01f.ts.net/podcast/live/briefing-episode/
@@ -423,6 +423,9 @@ podcast-add-episode /tmp/briefing-episode.mp3 "$TITLE" "$DESCRIPTION" \
     --transcript /tmp/briefing-groq-transcript.srt
 rm -f /tmp/briefing-shownotes.md
 
+# Step 5 runs in a separate shell: hand over the variables it needs
+printf 'TITLE=%q\nDESCRIPTION=%q\nTRANSCRIPT_URL=%q\n' "$TITLE" "$DESCRIPTION" "$TRANSCRIPT_URL" > /tmp/briefing-meta.env
+
 # Update recent summaries AFTER podcast-add-episode so the title check above sees no entry
 # on a first-run day (and correctly adds a suffix only on genuine same-day reruns)
 cd /Users/claude/.claude/skills/news-briefing && \
@@ -431,13 +434,9 @@ node scripts/update-recent-summaries.js '{
   "headlines_topics": ["topic 1", "topic 2", "..."],
   "deep_dives": ["Article 1 subject", "Article 2 subject", "Article 3 subject"]
 }'
-
-# Clean up all temp files from this run (IMPORTANT: prevents stale files from confusing future sessions)
-rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
-      /tmp/briefing-groq-transcript.md /tmp/briefing-groq-transcript.srt \
-      /tmp/article1.md /tmp/article2.md /tmp/article3.md \
-      /tmp/briefing-selection.env /tmp/briefing-selection.json
 ```
+
+Do not delete the temp files yet: step 5 still needs the MP3, and step 6 cleans up.
 
 Show notes contain a link to the formatted script (hosted in `static/articles/`). The `--transcript` flag embeds a `<podcast:transcript>` element in the feed with accurate word-level timing so Podcasting 2.0 apps (e.g. AntennaPod) can show synchronised in-app transcripts. Articles older than 7 days are cleaned up automatically by the `read-article` script.
 
@@ -447,6 +446,7 @@ Run after every briefing:
 
 ```bash
 # Upload to the "Daily Briefing" show on Spotify
+source /tmp/briefing-meta.env   # TITLE, DESCRIPTION, TRANSCRIPT_URL from step 4
 COVER_IMG="/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg"
 SPOTIFY_RESULT=$(save-to-spotify --json upload /tmp/briefing-episode.mp3 \
   --title "$TITLE" \
@@ -469,7 +469,18 @@ fi
 
 The show `spotify:show:033dnvdmfbg1F8Ch3wd5sd` ("Daily Briefing") is pre-created. Cover art is at `/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg` (terracotta starburst, matching the podcast feed). Episodes are private to the user's Spotify library. If `save-to-spotify` is not on PATH or auth has expired, skip this step silently — don't block the briefing.
 
-6. **Notify the user — mandatory, every run**: Output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). **Always include a push page: tag `@Cosimo` or call `notify_user`. This is never optional, even when the session looks interactive — Cosimo regularly steps away for the half hour a briefing takes, and the page is the only thing that tells him it finished. Do not reason that he is watching the chat; he isn't.** Include the episode title, a one-line summary of the three articles, and the TTS cost (the `COST:` line in `/tmp/briefing-tts-output.txt`, e.g. "TTS cost: $0.12"; then `rm -f` that file). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
+6. **Clean up** — after the Spotify upload (or after step 4 if you passed `--no-spotify`). Print the TTS cost first, then delete every temp file from this run (IMPORTANT: prevents stale files from confusing future sessions):
+
+```bash
+grep '^COST:' /tmp/briefing-tts-output.txt
+rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
+      /tmp/briefing-groq-transcript.md /tmp/briefing-groq-transcript.srt \
+      /tmp/article1.md /tmp/article2.md /tmp/article3.md \
+      /tmp/briefing-selection.env /tmp/briefing-selection.json \
+      /tmp/briefing-meta.env /tmp/briefing-tts-output.txt
+```
+
+7. **Notify the user — mandatory, every run**: Output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). **Always include a push page: tag `@Cosimo` or call `notify_user`. This is never optional, even when the session looks interactive — Cosimo regularly steps away for the half hour a briefing takes, and the page is the only thing that tells him it finished. Do not reason that he is watching the chat; he isn't.** Include the episode title, a one-line summary of the three articles, and the TTS cost (the `COST:` line step 6 printed, e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
 **Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. Use `er-marc-filippino` when the user wants ElevenReader (faster, cloud, no `--live`); `claude-*` presets are Anthropic claude.ai TTS (cloud, `--live` capable).
 
