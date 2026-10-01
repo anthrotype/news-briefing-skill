@@ -298,7 +298,7 @@ Apply corrections from both passes before proceeding to TTS. You are the author:
 
 #### Podcast Mode (Default)
 
-Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent. **Always run in the foreground** — a background run was killed mid-job for unknown reasons; foreground with `timeout: 1200000` has proven reliable.
+Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent. Chunked engines (the default MOSS voice included) take 10-17 minutes, so **run `podcast-tts` as a background job** (`run_in_background: true`, Bash `timeout: 3600000`) and resume from the completion notification. A foreground Bash call cannot wait that long: the harness caps it at 600000 ms, ignores a larger `timeout`, and moves the command to the background after 10 minutes (tested 2026-10-01 with an 11-minute command). Whichever way it starts, **verify the MP3 before publishing** (step 3).
 
 1. **Confirm the corrected script** from step 5.5 is at `/tmp/briefing-script.txt` (**no style preamble needed** — the preset handles it). Only if you skipped sub-editing entirely, save it now:
 
@@ -316,11 +316,31 @@ SCRIPT
 
 (Use `briefing-episode` as the basename — it must match the basename of the MP3 output path in the next step.)
 
-3. **Generate the MP3** using `podcast-tts` with `--live` so it produces an HLS event-playlist alongside the final MP3, and **capture the cost**:
+3. **Generate the MP3** using `podcast-tts` with `--live` so it produces an HLS event-playlist alongside the final MP3, and **capture the cost**. Run it as a background Bash job (`run_in_background: true`, `timeout: 3600000`). Shell variables do not survive between calls, so the output goes to a file:
 
 ```bash
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice moss-marc-filippino --live < /tmp/briefing-script.txt)
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice moss-marc-filippino --live < /tmp/briefing-script.txt); echo "exit=$?"; echo "$TTS_OUTPUT" > /tmp/briefing-tts-output.txt
 ```
+
+The cost line (`COST:...`) ends up in `/tmp/briefing-tts-output.txt`.
+
+**Verify the MP3 before step 4.** `podcast-tts` writes the MP3 only at the very end ("Converting to MP3... Done"), so a killed run leaves no file, or a stale one from an earlier run. Check that the run exited 0, that the file is newer than the script, and that its duration is plausible for the word count:
+
+```bash
+python3 - <<'EOF'
+import os, subprocess, sys
+mp3, script = '/tmp/briefing-episode.mp3', '/tmp/briefing-script.txt'
+if not os.path.exists(mp3) or os.path.getmtime(mp3) < os.path.getmtime(script):
+    sys.exit('FAIL: no fresh MP3 (run died or MP3 is stale)')
+words = len(open(script).read().split())
+dur = float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', mp3]))
+exp = words / 2.6  # MOSS: 2,084 words -> 792 s (2026-10-01); recalibrate for other engines
+print(f'words={words} duration={dur:.0f}s expected~{exp:.0f}s')
+sys.exit(0 if 0.8 * exp <= dur <= 1.25 * exp else 'FAIL: duration outside 80-125% of expected')
+EOF
+```
+
+If it fails, do not publish: rerun `podcast-tts`. The band catches a killed or badly truncated run. It will not catch a lost final paragraph (about 10% of the audio), so also check that the Groq transcript in step 4 ends with the script's closing sentence.
 
 The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
 
@@ -335,13 +355,13 @@ TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-marc-filippino --k
 **Fish Audio cloud voices** (`--engine fish-cloud`, `fishcloud-*` presets, or `--voice economist-jason-palmer` etc.): Fish Audio S2.1 sends the entire script in one HTTP request and returns the complete audio when the server finishes — typically 2-3 minutes. Because it is a single-request engine:
 - Skip step 2 — fish-cloud does not support `--live`, so there is no stream URL to announce.
 - Do NOT pass `--live` in the `podcast-tts` command.
-- **Always run in foreground** (not background). The Claude Code harness kills background tasks before a multi-minute HTTP response completes, which silently truncates the file. Use a 1200000ms timeout:
+- **Run in the foreground** with a 600000ms timeout (it finishes well inside the 10-minute foreground cap). An earlier note (2026-08-01) said the harness killed background tasks before this single HTTP response landed and silently truncated the file; that was never diagnosed or retested, so keep fish-cloud in the foreground:
 
 ```bash
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --engine fish-cloud --voice economist-jason-palmer < /tmp/briefing-script.txt)
 ```
 
-**Waiting for TTS to complete:** All engines run in the foreground Bash tool with a 1200000ms timeout. Do not use `run_in_background` — a background run was killed mid-job; foreground is reliable. Chunked engines (moss, kokoro, gemini, claude, etc.) typically take 10-17 minutes and support `--live`; single-request engines (fish-cloud, elevenreader) complete in 2-5 minutes. Both run in the foreground.
+**Waiting for TTS to complete:** Chunked engines (moss, kokoro, gemini, claude, etc.) typically take 10-17 minutes and support `--live`: run them as a background job (`run_in_background: true`, `timeout: 3600000`) and resume from the completion notification. Single-request engines (fish-cloud, elevenreader) complete in 2-5 minutes: run them in the foreground with a 600000ms timeout. The foreground cap is 600000 ms whatever `timeout` is requested. History: a background run died mid-job on 2026-05-31 for a cause nobody found (the agent invented one), and the rule was set to "always foreground" on 2026-08-12. That rule only worked because the harness moves a long foreground call to the background after 10 minutes. A 13m12s background run completed cleanly on 2026-10-01, and the MP3 check in step 3 covers the old failure.
 
 Do not poll segment counts or process status in a loop of individual shell calls. The script prints per-chunk progress to stderr, e.g. `done in 8.4s | avg 8.1s/chunk | eta ~8m`; inspect that output only after completion/failure notification or when the user explicitly asks for status.
 
@@ -449,7 +469,7 @@ fi
 
 The show `spotify:show:033dnvdmfbg1F8Ch3wd5sd` ("Daily Briefing") is pre-created. Cover art is at `/Users/Shared/projects/static/podcast/cover-daily-briefing.jpg` (terracotta starburst, matching the podcast feed). Episodes are private to the user's Spotify library. If `save-to-spotify` is not on PATH or auth has expired, skip this step silently — don't block the briefing.
 
-6. **Notify the user — mandatory, every run**: Output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). **Always include a push page: tag `@Cosimo` or call `notify_user`. This is never optional, even when the session looks interactive — Cosimo regularly steps away for the half hour a briefing takes, and the page is the only thing that tells him it finished. Do not reason that he is watching the chat; he isn't.** Include the episode title, a one-line summary of the three articles, and the TTS cost (e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
+6. **Notify the user — mandatory, every run**: Output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). **Always include a push page: tag `@Cosimo` or call `notify_user`. This is never optional, even when the session looks interactive — Cosimo regularly steps away for the half hour a briefing takes, and the page is the only thing that tells him it finished. Do not reason that he is watching the chat; he isn't.** Include the episode title, a one-line summary of the three articles, and the TTS cost (the `COST:` line in `/tmp/briefing-tts-output.txt`, e.g. "TTS cost: $0.12"; then `rm -f` that file). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
 **Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. Use `er-marc-filippino` when the user wants ElevenReader (faster, cloud, no `--live`); `claude-*` presets are Anthropic claude.ai TTS (cloud, `--live` capable).
 
