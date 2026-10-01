@@ -594,7 +594,7 @@ The script's style bible: Economist radio register distilled (July 2026) from th
 Custom subagent definition for the `briefing-sub-editor` (runs on Fable), registered via symlink at `~/.claude/agents/briefing-sub-editor.md`. Proofreads the draft against broadcast-style.md and returns numbered corrections; read-only by design — the author applies the edits. Invoked in step 5.5.
 
 ### references/briefing-analysis-*.md
-Monthly thematic reports on the past month's briefings (themes ranked by frequency, how each developed, key dates and figures). Written on the 23rd by the `monthly-briefing-analysis` cron job (`/Users/Shared/projects/scripts/monthly-briefing-analysis`). Generated files, not tracked in git. Read the newest in step 5, only after the deep dives and headline stories are chosen, and use it for context only.
+Monthly thematic reports on the past month's briefings (themes ranked by frequency, how each developed, key dates and figures). Written on the 23rd by the `monthly-briefing-analysis` cron job (`/Users/Shared/projects/scripts/monthly-briefing-analysis`). Generated files, committed to the repo. Read the newest in step 5, only after the deep dives and headline stories are chosen, and use it for context only.
 
 ### references/preferences.md
 Learned preferences from user feedback. Updated after each briefing based on user's response. Tracks:
