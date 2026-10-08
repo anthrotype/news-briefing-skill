@@ -124,6 +124,8 @@ Exit 0 means all three scraped. Exit 2 means one or more scrapes failed: the out
 
 `scrape-remote` uses the remote Chrome session (CDP on port **9224**, Mac Studio Chrome Beta) to bypass paywalls with the user's credentials. Port 9223 is the Crostini legacy fallback — do not use it unless Mac Studio is unreachable.
 
+**Never run scrapes in parallel.** `scrape-remote` and `scrape-snapshot` all drive the same Chrome, and concurrent navigations abort each other (`Navigation failed: net::ERR_ABORTED`; on 2026-10-08, six of seven backgrounded scrapes failed this way). `select-articles.js` already scrapes one article at a time. For any extra scrape (for example headline stories whose full text you want for the roundup), loop sequentially in one command, taking each URL from `references/last-headlines.json` by id (`jq -r --arg id N1 '.. | objects | select(.id? == $id) | .url'`). Do not background the calls with `&`, and do not issue several scrape tool calls in the same turn.
+
 If `select-articles.js` reported a failed slot, work through these in order, always taking the URL from the env file:
 
 **Retry on failure:** If the scrape failed or returned empty/bot-challenge content (very short output, "just a moment", "verifying you are human"), restart the **Mac Studio** browser and retry:
