@@ -1,7 +1,7 @@
 ---
 name: news-briefing
 description: Generate daily news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge). Supports both audio (via TTS) and text-only modes.
-args: "[--text-only] [--whatsapp] [--voice moss-marc-filippino|er-marc-filippino|aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift|claude-buttery|claude-airy|claude-mellow|claude-glassy|claude-rounded]"
+args: "[--text-only] [--whatsapp] [--elevenreader] [--voice moss-marc-filippino|aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift|claude-buttery|claude-airy|claude-mellow|claude-glassy|claude-rounded]"
 ---
 
 # News Briefing
@@ -24,6 +24,7 @@ Invoke this skill from the current harness (`/news-briefing` in Claude Code slas
 - **Voice choice**: `--voice claude-buttery` (also claude-airy/mellow/glassy/rounded) - Anthropic claude.ai TTS via OAuth (cloud; 16 kHz source so narrower-band than the local 24-48 kHz engines; metering unestablished — usage is logged per synthesis; supports --live)
 - **WhatsApp mode**: `--whatsapp` - Sends as WhatsApp voice message (legacy behavior)
 - **Text-only mode**: `--text-only` - Saves transcript to file and sends file link (no TTS cost)
+- **ElevenReader mode**: `--elevenreader`, or whenever the user asks for ElevenReader - uploads the script to the user's ElevenReader library as text and does nothing else: no TTS here, no audio download, no podcast feed, no Spotify. The user listens in ElevenReader's own web or mobile reader and picks the voice and expressiveness there. MOSS stays the default for every other run.
 
 ## Workflow
 
@@ -346,13 +347,7 @@ If it fails, do not publish: rerun `podcast-tts`. The band catches a killed or b
 
 The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
 
-Pass through the `--voice` flag from the user's args. Default is `moss-marc-filippino` if not specified. Use `er-marc-filippino` when the user explicitly asks for ElevenReader (faster, cloud-based, flat-rate Ultra subscription, but no `--live` streaming). The `claude-*` presets (buttery/airy/mellow/glassy/rounded) are Anthropic claude.ai TTS via OAuth: cloud, `--live` capable, no per-use cost observed so far (metering unestablished; podcast-tts logs usage per synthesis).
-
-**ElevenReader voices** (`er-*` presets): When the voice is an ElevenReader preset, also pass `--keep-read --title "$TITLE"` so the document stays in the ElevenReader library as a secondary consumption channel via their mobile app. ElevenReader is a batch engine (no `--live` streaming), so skip the live URL announcement in step 2. Example:
-
-```bash
-TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-marc-filippino --keep-read --title "$TITLE" < /tmp/briefing-script.txt)
-```
+Pass through the `--voice` flag from the user's args. Default is `moss-marc-filippino` if not specified. ElevenReader is not a TTS voice for briefings any more: when the user asks for it, use ElevenReader Mode below instead. The `claude-*` presets (buttery/airy/mellow/glassy/rounded) are Anthropic claude.ai TTS via OAuth: cloud, `--live` capable, no per-use cost observed so far (metering unestablished; podcast-tts logs usage per synthesis).
 
 **Fish Audio cloud voices** (`--engine fish-cloud`, `fishcloud-*` presets, or `--voice economist-jason-palmer` etc.): Fish Audio S2.1 sends the entire script in one HTTP request and returns the complete audio when the server finishes — typically 2-3 minutes. Because it is a single-request engine:
 - Skip step 2 — fish-cloud does not support `--live`, so there is no stream URL to announce.
@@ -363,7 +358,7 @@ TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice er-marc-filippino --k
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --engine fish-cloud --voice economist-jason-palmer < /tmp/briefing-script.txt)
 ```
 
-**Waiting for TTS to complete:** Chunked engines (moss, kokoro, gemini, claude, etc.) typically take 10-17 minutes and support `--live`: run them as a background job (`run_in_background: true`, `timeout: 3600000`) and resume from the completion notification. Single-request engines (fish-cloud, elevenreader) complete in 2-5 minutes: run them in the foreground with a 600000ms timeout. The foreground cap is 600000 ms whatever `timeout` is requested. History: a background run died mid-job on 2026-05-31 for a cause nobody found (the agent invented one), and the rule was set to "always foreground" on 2026-08-12. That rule only worked because the harness moves a long foreground call to the background after 10 minutes. A 13m12s background run completed cleanly on 2026-10-01, and the MP3 check in step 3 covers the old failure.
+**Waiting for TTS to complete:** Chunked engines (moss, kokoro, gemini, claude, etc.) typically take 10-17 minutes and support `--live`: run them as a background job (`run_in_background: true`, `timeout: 3600000`) and resume from the completion notification. Single-request engines (fish-cloud) complete in 2-5 minutes: run them in the foreground with a 600000ms timeout. The foreground cap is 600000 ms whatever `timeout` is requested. History: a background run died mid-job on 2026-05-31 for a cause nobody found (the agent invented one), and the rule was set to "always foreground" on 2026-08-12. That rule only worked because the harness moves a long foreground call to the background after 10 minutes. A 13m12s background run completed cleanly on 2026-10-01, and the MP3 check in step 3 covers the old failure.
 
 Do not poll segment counts or process status in a loop of individual shell calls. The script prints per-chunk progress to stderr, e.g. `done in 8.4s | avg 8.1s/chunk | eta ~8m`; inspect that output only after completion/failure notification or when the user explicitly asks for status.
 
@@ -484,7 +479,7 @@ rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
 
 7. **Notify the user — mandatory, every run**: Output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). **Always include a push page: tag `@Cosimo` or call `notify_user`. This is never optional, even when the session looks interactive — Cosimo regularly steps away for the half hour a briefing takes, and the page is the only thing that tells him it finished. Do not reason that he is watching the chat; he isn't.** Include the episode title, a one-line summary of the three articles, and the TTS cost (the `COST:` line step 6 printed, e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
-**Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. Use `er-marc-filippino` when the user wants ElevenReader (faster, cloud, no `--live`); `claude-*` presets are Anthropic claude.ai TTS (cloud, `--live` capable).
+**Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. `claude-*` presets are Anthropic claude.ai TTS (cloud, `--live` capable). For ElevenReader see ElevenReader Mode.
 
 #### WhatsApp Mode (--whatsapp)
 
@@ -519,6 +514,28 @@ chmod 644 "$TRANSCRIPT_FILE"
 echo "Transcript available at: https://cosimos-mac-studio.tail2af01f.ts.net/articles/${SLUG}.md"
 ```
 
+#### ElevenReader Mode (--elevenreader)
+
+When the user asks for ElevenReader (MOSS remains the default for every other run), the briefing goes into their ElevenReader library as text and nowhere else. They listen in ElevenReader's own web or mobile reader and choose the voice and expressiveness there. Do NOT render audio, do NOT download audio from ElevenReader, and do NOT publish to the podcast feed or Spotify. Podcast Mode's steps 2, 3 and 5 (live URL, TTS, Spotify) and the feed publication in step 4 do not apply.
+
+Steps 0 to 5.5 run as usual, including the sub-edit and the fact-check, and step 4.5 still records the selection. Then:
+
+1. Work out the title. Same rule as Podcast Mode step 4: `News Briefing - <Month D, YYYY>`, with a `(Morning)`, `(Afternoon)`, `(Evening)` or `(Late Edition)` suffix when `recent_summaries.json` already has an entry for today. Do this before the summary update in step 3 below.
+2. Upload the script. ElevenReader names a read after the first line of its text, so the helper puts the title in as a heading and strips the `---` separators:
+
+```bash
+cd /Users/Shared/projects/oss/news-briefing-skill && \
+uv run --project /Users/Shared/projects/oss/mcp-elevenreader \
+  python scripts/upload-to-elevenreader.py /tmp/briefing-script.txt "$TITLE"
+```
+
+It prints `read_id=`, `title=` and `words=`. Check that the title is the one you passed and that the word count is within a few words of the script's.
+3. Record the day with `scripts/update-recent-summaries.js`, exactly as in Podcast Mode step 4, so tomorrow's briefing does not repeat today's stories.
+4. Clean up: `rm -f /tmp/briefing-script.txt /tmp/article1.md /tmp/article2.md /tmp/article3.md /tmp/briefing-selection.env /tmp/briefing-selection.json /tmp/headline-*.md`.
+5. Notify with a push page (tag `@Cosimo` or call `notify_user`): the title, a one-line summary of the three articles, and that it is in the ElevenReader library. There is no TTS cost line.
+
+Never delete the read afterwards; it is the deliverable. The `er-*` presets remain in `podcast-tts` for ad-hoc use but are not part of this workflow. Voice clones are not available on ElevenReader any more (the ElevenLabs subscription ended), so the Marc Filippino clone does not work there; only stock and library voices do.
+
 ### 7. Capture Feedback
 
 After sending, wait for user feedback. Common patterns:
@@ -538,6 +555,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - Podcast mode (default) publishes to the private Apple Podcast feed via Tailscale and uploads to Spotify. Pass `--no-spotify` to skip Spotify upload.
 - Use `--whatsapp` for immediate voice message delivery (e.g. when user wants it NOW)
 - Use `--text-only` to skip TTS entirely (fastest, no cost)
+- Use `--elevenreader` to put the text in the ElevenReader library and nothing else (no audio, no feed, no Spotify)
 - The `--voice` flag controls TTS: `chris-brift` (ElevenLabs, default), `archer` (younger editorial), `adam-stone` (deeper), or `aoede` (Gemini, free)
 
 **Article selection:**
@@ -557,7 +575,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph. This now applies to fish-cloud too — it used to be the exception, but it splits and splices at `---` like the rest (see Fish Audio delivery tags above)
 
 **Voice delivery (podcast/whatsapp modes):**
-- `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio). Use `er-marc-filippino` for ElevenReader (cloud, faster, no live streaming).
+- `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio).
 - `--voice claude-buttery` (or claude-airy/mellow/glassy/rounded): Anthropic claude.ai TTS via OAuth (cloud, `--live` capable, 16 kHz source — narrower-band than local engines; multilingual with no extra flags).
 - `--voice aoede`: Gemini Flash, female British newsreader, cheap
 - `--voice aoede-pro`: Gemini Pro, female British newsreader, 2x cost, richer expressivity
@@ -596,6 +614,9 @@ TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio 
 
 ### scripts/select-articles.js
 `node scripts/select-articles.js E2 F1 V3` — resolves three article ids against `references/last-headlines.json`, rejects ids already in the 7-day history (`--force` to override), writes `/tmp/briefing-selection.env` and `/tmp/briefing-selection.json`, and scrapes each article to `/tmp/articleN.md` with `scrape-remote` (`--no-scrape` to only write the selection). Exit 0 all scraped, 2 some scrape failed (fallback commands printed), 1 bad input. Exists so that no URL is ever retyped by the model.
+
+### scripts/upload-to-elevenreader.py
+`uv run --project /Users/Shared/projects/oss/mcp-elevenreader python scripts/upload-to-elevenreader.py <script.txt> "<title>"` — uploads the briefing text to the ElevenReader library with the title as a heading and prints `read_id=`, `title=`, `words=`. No TTS, no audio download. Used by ElevenReader Mode.
 
 ### scripts/update-article-history.js
 No arguments: records the three articles from `/tmp/briefing-selection.json` in `article-history.json` with today's date and prunes entries older than 7 days.
