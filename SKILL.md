@@ -263,6 +263,8 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - **Tone cues**: use `[chuckling]` at the start of a sentence for dry/wry moments; use `[confident]` for declarative assertions the presenter owns. The canonical S2 forms are `[whispering]` and `[chuckling]`; empirically `[chuckle]` also works; `[excited]` is flaky. These emotion and tone tags do work — it is only the pause markers that are inert.
 - Do NOT insert these tags for other engines. On MOSS they are not read aloud literally, but they misbehave: inline within a sentence they become pauses or odd vocalizations ("[chuckling]" produced a sigh), and isolated on their own line — exactly where the section-break conversion puts them — MOSS hallucinates speech-like noises (observed on the Aug 1 episode re-run). On other engines assume they are read aloud.
 
+**Drama 3 speech tags (`--voice drama3-marc-filippino`).** This local engine uses the same clone presets as MOSS. Keep ordinary news narration untagged. For an intentional delivery change, put `[laughs]`, `[sighs]`, or `[whispers]` immediately before the relevant text. These are generation cues, not exact timing controls. Do not carry MOSS `[pause X.Ys]` or Fish S2 pause tags into a Drama 3 script. Use `---` for section breaks; `podcast-tts` inserts real silence. Speaker tags `<|speaker:0|>` through `<|speaker:15|>` select speakers, but this wrapper supplies only one clone reference per request. Use separate renders when each speaker needs a distinct reference. [Upstream tag and streaming guide](https://blaizzy.github.io/mlx-audio/models/tts/fish-drama3.html).
+
 **MOSS pause markers (moss/moss-lt engines, the default).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
 
 - Section breaks stay `---`. MOSS never sees the separator — podcast-tts strips it at chunking and splices silence in at concatenation (1.75s at `---`, 0.7s at paragraph breaks, per `MOSS_GAPS`). Do not use `[long-break]`/`[break]` with MOSS.
@@ -575,6 +577,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - **`---` section separators**: put `---` on its own line between every section (intro, each article, editorial). `podcast-tts` uses these to split audio chunks cleanly at section boundaries rather than arbitrarily mid-paragraph. This now applies to fish-cloud too — it used to be the exception, but it splits and splices at `---` like the rest (see Fish Audio delivery tags above)
 
 **Voice delivery (podcast/whatsapp modes):**
+- `--voice drama3-marc-filippino`: local Fish Audio Drama 3 4-bit with Marc's clone. Other `drama3-<preset>` voices include `gemma`, `gina`, and `jason-palmer`.
 - `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio).
 - `--voice claude-buttery` (or claude-airy/mellow/glassy/rounded): Anthropic claude.ai TTS via OAuth (cloud, `--live` capable, 16 kHz source — narrower-band than local engines; multilingual with no extra flags).
 - `--voice aoede`: Gemini Flash, female British newsreader, cheap
