@@ -265,6 +265,8 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 
 **Drama 3 speech tags (`--voice drama3-marc-filippino`).** This local engine uses the same clone presets as MOSS. Keep ordinary news narration untagged. For an intentional delivery change, put `[laughs]`, `[sighs]`, or `[whispers]` immediately before the relevant text. These are generation cues, not exact timing controls. Do not carry MOSS `[pause X.Ys]` or Fish S2 pause tags into a Drama 3 script. Use `---` for section breaks; `podcast-tts` inserts real silence. Speaker tags `<|speaker:0|>` through `<|speaker:15|>` select speakers, but this wrapper supplies only one clone reference per request. Use separate renders when each speaker needs a distinct reference. [Upstream tag and streaming guide](https://blaizzy.github.io/mlx-audio/models/tts/fish-drama3.html).
 
+**Ming (`--voice ming-uk-george`, `ming-marc-filippino`, other `ming-<preset>`).** Local Ant Group Ming-3.0-tts 0.5B, faster than real time. It has no text normalisation, so a Ming script must write every number, date, currency amount and percentage out in words ("three point two per cent", not "3.2%"); abbreviations that should be expanded need the same treatment. Keep narration untagged; Ming's inline tags are capitalised (`[Sigh]`, `[Laughter]`), and the MOSS, Fish S2 and Drama 3 tags do not apply. Use `---` for section breaks.
+
 **MOSS pause markers (moss/moss-lt engines, the default).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
 
 - Section breaks stay `---`. MOSS never sees the separator — podcast-tts strips it at chunking and splices silence in at concatenation (1.75s at `---`, 0.7s at paragraph breaks, per `MOSS_GAPS`). Do not use `[long-break]`/`[break]` with MOSS.
@@ -578,6 +580,7 @@ When feedback is received, update `references/preferences.md` immediately:
 
 **Voice delivery (podcast/whatsapp modes):**
 - `--voice drama3-marc-filippino`: local Fish Audio Drama 3 4-bit with Marc's clone. Other `drama3-<preset>` voices include `gemma`, `gina`, and `jason-palmer`.
+- `--voice ming-uk-george`: local Ming-3.0-tts 0.5B built-in British voice; also `ming-uk-charlotte` and `ming-<clone preset>` such as `ming-marc-filippino`. Write numbers as words.
 - `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio).
 - `--voice claude-buttery` (or claude-airy/mellow/glassy/rounded): Anthropic claude.ai TTS via OAuth (cloud, `--live` capable, 16 kHz source — narrower-band than local engines; multilingual with no extra flags).
 - `--voice aoede`: Gemini Flash, female British newsreader, cheap
