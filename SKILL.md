@@ -315,7 +315,7 @@ cat > /tmp/briefing-script.txt << 'SCRIPT'
 SCRIPT
 ```
 
-2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts`. The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 7).
+2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts` (skip this step for the GPT-Live voices, see below). The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 7).
 
 ```text
 🔴 Live now (give it ~10s for the first segment): https://cosimos-mac-studio.tail2af01f.ts.net/podcast/live/briefing-episode/
@@ -323,7 +323,7 @@ SCRIPT
 
 (Use `briefing-episode` as the basename — it must match the basename of the MP3 output path in the next step.)
 
-3. **Generate the MP3** using `podcast-tts` with `--live` so it produces an HLS event-playlist alongside the final MP3, and **capture the cost**. Run it as a background Bash job (`run_in_background: true`, `timeout: 3600000`). Shell variables do not survive between calls, so the output goes to a file:
+3. **Generate the MP3** using `podcast-tts` with `--live` (not for the GPT-Live voices, see below) so it produces an HLS event-playlist alongside the final MP3, and **capture the cost**. Run it as a background Bash job (`run_in_background: true`, `timeout: 3600000`). Shell variables do not survive between calls, so the output goes to a file:
 
 ```bash
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice moss-marc-filippino --live < /tmp/briefing-script.txt); echo "exit=$?"; echo "$TTS_OUTPUT" > /tmp/briefing-tts-output.txt
@@ -361,6 +361,20 @@ Pass through the `--voice` flag from the user's args. Default is `moss-marc-fili
 ```bash
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --engine fish-cloud --voice economist-jason-palmer < /tmp/briefing-script.txt)
 ```
+
+**GPT-Live voices** (`--voice gpt-live-web-sol`, ChatGPT web voice allowance; `--voice gpt-live-codex-sol`, Codex allowance). Sol reads the script expressively and may change a word or add a short preamble, so the recording needs checking before it is published. Rules:
+- **No live stream.** Skip step 2 and do NOT pass `--live`: the recording needs post-processing, so a live stream would carry the uncut audio. Run in the background (`timeout: 3600000`) without it:
+
+```bash
+TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice gpt-live-web-sol < /tmp/briefing-script.txt); echo "exit=$?"; echo "$TTS_OUTPUT" > /tmp/briefing-tts-output.txt
+```
+
+- **Keep Chrome free during a web run.** The web route drives the shared Chrome on CDP 9224. Do not run `scrape-remote`, `agent-browser` or other browser tasks until it finishes. Finish all scraping first.
+- **Check the metadata.** `/tmp/briefing-episode.mp3.gpt-live.json` must show `completed: true`, `chatDeleted: true` (web route) and per-chunk capture times that match (`wallSeconds` against `audioSeconds`). A failed web run leaves its temporary ChatGPT chat and tab open: delete the chat before retrying, retry once, and if it fails again report where it broke and ask before switching route. It died once after chunk 1 on 2026-10-21 (`__podcastVoice is not defined`) and the retry completed.
+- **Check the audio.** Transcribe the MP3 with two recognisers, Groq (`groq-transcribe`) and local Parakeet (`/v1/audio/transcriptions`, model `parakeet-tdt-0.6b-v3`, `word_timestamps=true`), because each drops words the other hears (on 2026-10-21 Groq lost "ten million" and "That", Parakeet truncated clip tails). Look for leftover Sol preambles at chunk openings ("I'll give it a clear, thoughtful reading"; the automatic trimmer only cuts when it finds the script's first eight words, so openings with names it mishears are left in), misread names and numbers (Sol said "Vladimir Zelensky" for Volodymyr), and the closing sentence. The Parakeet clip text is the evidence for a name or number, not Groq's.
+- **Edit the original recording, never the finished MP3.** `podcast-tts` keeps the lossless chunk recordings in `/tmp/briefing-episode.mp3.raw/`. `gpt_live_assemble.py /tmp/briefing-episode.mp3.raw --list` shows each chunk and where it sits in the episode. Find the fault by transcribing the single `raw-N.wav` and checking its silences, write the spans to remove into `/tmp/briefing-edits.json` (seconds of that raw chunk, cuts in silence), then rebuild with `/Users/Shared/projects/oss/podcasting/gpt_live_assemble.py /tmp/briefing-episode.mp3.raw /tmp/briefing-episode.mp3 --edits /tmp/briefing-edits.json`. Every cut runs on the float recordings before the one MP3 encode. Repeat the audio check on the rebuilt MP3, and say in the notification what you cut or changed. Format and details: `/Users/Shared/projects/oss/podcasting/GPT-LIVE.md`.
+- **Duration check.** The `words / 2.6` calibration is for MOSS. Sol's pauses give about 2.8 words per second (2,033 words became 718 s on 2026-10-21). Use the transcript check above as the completeness test.
+- **Cost line.** The web route prints the remaining voice allowance in `COST:`, not a dollar figure. Quote that in the notification. The Codex route prints an estimate.
 
 **Waiting for TTS to complete:** Chunked engines (moss, kokoro, gemini, claude, etc.) typically take 10-17 minutes and support `--live`: run them as a background job (`run_in_background: true`, `timeout: 3600000`) and resume from the completion notification. Single-request engines (fish-cloud) complete in 2-5 minutes: run them in the foreground with a 600000ms timeout. The foreground cap is 600000 ms whatever `timeout` is requested. History: a background run died mid-job on 2026-05-31 for a cause nobody found (the agent invented one), and the rule was set to "always foreground" on 2026-08-12. That rule only worked because the harness moves a long foreground call to the background after 10 minutes. A 13m12s background run completed cleanly on 2026-10-01, and the MP3 check in step 3 covers the old failure.
 
@@ -478,7 +492,9 @@ rm -f /tmp/briefing-episode.mp3 /tmp/briefing-script.txt \
       /tmp/briefing-groq-transcript.md /tmp/briefing-groq-transcript.srt \
       /tmp/article1.md /tmp/article2.md /tmp/article3.md \
       /tmp/briefing-selection.env /tmp/briefing-selection.json \
-      /tmp/briefing-meta.env /tmp/briefing-tts-output.txt
+      /tmp/briefing-meta.env /tmp/briefing-tts-output.txt \
+      /tmp/briefing-edits.json /tmp/briefing-episode.mp3.gpt-live.json
+rm -rf /tmp/briefing-episode.mp3.raw   # GPT-Live voices only: the lossless chunk recordings (150 to 300 MB)
 ```
 
 7. **Notify the user — mandatory, every run**: Output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). **Always include a push page: tag `@Cosimo` or call `notify_user`. This is never optional, even when the session looks interactive — Cosimo regularly steps away for the half hour a briefing takes, and the page is the only thing that tells him it finished. Do not reason that he is watching the chat; he isn't.** Include the episode title, a one-line summary of the three articles, and the TTS cost (the `COST:` line step 6 printed, e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
