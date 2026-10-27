@@ -1,7 +1,7 @@
 ---
 name: news-briefing
 description: Generate daily news briefings covering world politics, economics, business, and technology. Use when the user asks for "news", "latest news", "what's happening", "news briefing", "news podcast", or similar requests for current events. Creates 10-15 minute summaries with expanded headlines section plus deep-dives into 3 selected articles from paywalled sources (Economist, FT, Guardian, NYT, Verge). Supports both audio (via TTS) and text-only modes.
-args: "[--text-only] [--whatsapp] [--elevenreader] [--voice moss-marc-filippino|aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift|claude-buttery|claude-airy|claude-mellow|claude-glassy|claude-rounded]"
+args: "[--text-only] [--whatsapp] [--elevenreader] [--voice gpt-live-web-sol|gpt-live-codex-sol|moss-marc-filippino|aoede|aoede-pro|adam-stone|chris-brift|archer|emma|daniel|kokoro-aoede|qwen-newsreader|qwen-chris-brift|claude-buttery|claude-airy|claude-mellow|claude-glassy|claude-rounded]"
 ---
 
 # News Briefing
@@ -12,7 +12,7 @@ Generate personalized daily news briefings by fetching headlines from 5 major ne
 
 Invoke this skill from the current harness (`/news-briefing` in Claude Code slash-command form, `$news-briefing` or an explicit skill mention in Codex).
 
-- **Podcast mode (default)**: generate an MP3 via MOSS-TTS cloned Marc Filippino voice (free, local), then publish to the private podcast feed
+- **Podcast mode (default)**: generate an MP3 with the ChatGPT web voice (`gpt-live-web-sol`), falling back to GPT-Live via Codex (`gpt-live-codex-sol`) when the web route is not available, then publish to the private podcast feed
 - **Voice choice**: `--voice aoede-pro` - Uses Gemini Pro model (2x cost, richer expressivity)
 - **Voice choice**: `--voice adam-stone` - Uses ElevenLabs Adam Stone voice instead (1.2x, pricier)
 - **Voice choice**: `--voice chris-brift` - Uses ElevenLabs Chris Brift voice
@@ -267,14 +267,14 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 
 **Ming (`--voice ming-uk-george`, `ming-marc-filippino`, other `ming-<preset>`).** Local Ant Group Ming-3.0-tts 0.5B, faster than real time. It has no text normalisation, so a Ming script must write every number, date, currency amount and percentage out in words ("three point two per cent", not "3.2%"); abbreviations that should be expanded need the same treatment. Keep narration untagged; Ming's inline tags are capitalised (`[Sigh]`, `[Laughter]`), and the MOSS, Fish S2 and Drama 3 tags do not apply. Use `---` for section breaks.
 
-**MOSS pause markers (moss/moss-lt engines, the default).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
+**MOSS pause markers (moss/moss-lt engines).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
 
 - Section breaks stay `---`. MOSS never sees the separator — podcast-tts strips it at chunking and splices silence in at concatenation (1.75s at `---`, 0.7s at paragraph breaks, per `MOSS_GAPS`). Do not use `[long-break]`/`[break]` with MOSS.
 - `[pause X.Ys]` may be used sparingly for intra-section dramatic beats (e.g. the editorial pivot, or after a punchy standalone sentence), **inline only** — keep it inside a paragraph's text, never alone on its own line (a bracket tag standing alone risks the same hallucination as Fish tags there; inferred from the [break] behavior, not separately tested).
 - MOSS v1.5 has no documented emotion or sound-event tags ([laugh]/[music] belong to MOSS-TTSD, the separate dialogue model). Don't use them.
 - When converting a script between engines: both fish-cloud and MOSS now use `---` for section breaks, so conversion is only about the inline tags — strip Fish's `[chuckling]`/`[emphasis]`/emotion tags going to MOSS, and drop MOSS's inline `[pause X.Ys]` going to Fish (Fish ignores it).
 
-(Operational note: fish-cloud runs on a free API promotion expected to end late August 2026 and may be retired after that — MOSS is the default and the safe long-term target.)
+(Operational note: fish-cloud runs on a free API promotion expected to end late August 2026 and may be retired after that — MOSS is the safe long-term target among the local voices.)
 
 ### 5.5. Sub-Edit and Fact-Check the Draft
 
@@ -305,7 +305,7 @@ Apply corrections from both passes before proceeding to TTS. You are the author:
 
 #### Podcast Mode (Default)
 
-Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent. Chunked engines (the default MOSS voice included) take 10-17 minutes, so **run `podcast-tts` as a background job** (`run_in_background: true`, Bash `timeout: 3600000`) and resume from the completion notification. A foreground Bash call cannot wait that long: the harness caps it at 600000 ms, ignores a larger `timeout`, and moves the command to the background after 10 minutes (tested 2026-10-01 with an 11-minute command). Whichever way it starts, **verify the MP3 before publishing** (step 3).
+Generate the audio using `podcast-tts` and publish to the podcast feed. This works independently of the WhatsApp agent. Chunked engines (the default GPT-Live voices and MOSS included) take 10-17 minutes, so **run `podcast-tts` as a background job** (`run_in_background: true`, Bash `timeout: 3600000`) and resume from the completion notification. A foreground Bash call cannot wait that long: the harness caps it at 600000 ms, ignores a larger `timeout`, and moves the command to the background after 10 minutes (tested 2026-10-01 with an 11-minute command). Whichever way it starts, **verify the MP3 before publishing** (step 3).
 
 1. **Confirm the corrected script** from step 5.5 is at `/tmp/briefing-script.txt` (**no style preamble needed** — the preset handles it). Only if you skipped sub-editing entirely, save it now:
 
@@ -315,7 +315,7 @@ cat > /tmp/briefing-script.txt << 'SCRIPT'
 SCRIPT
 ```
 
-2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts` (skip this step for the GPT-Live voices, see below). The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 7).
+2. **Announce the live stream URL** in the current chat *before* starting `podcast-tts` (skip this step for the GPT-Live voices, which are the default, see below: it applies only when you pick a `--live` voice such as MOSS). The URL is deterministic from the output filename — no need to wait for the script to print it. Just output the following as plain text — do NOT use `speak` or any other tool. Do NOT tag `@Cosimo` here; save the push notification for when the episode is fully published (step 7).
 
 ```text
 🔴 Live now (give it ~10s for the first segment): https://cosimos-mac-studio.tail2af01f.ts.net/podcast/live/briefing-episode/
@@ -323,7 +323,7 @@ SCRIPT
 
 (Use `briefing-episode` as the basename — it must match the basename of the MP3 output path in the next step.)
 
-3. **Generate the MP3** using `podcast-tts` with `--live` (not for the GPT-Live voices, see below) so it produces an HLS event-playlist alongside the final MP3, and **capture the cost**. Run it as a background Bash job (`run_in_background: true`, `timeout: 3600000`). Shell variables do not survive between calls, so the output goes to a file:
+3. **Generate the MP3** using `podcast-tts` and **capture the cost**. The default is the ChatGPT web voice, with GPT-Live via Codex as the fallback (see **GPT-Live voices** below for the commands, the fallback rule and the checks). The MOSS command below is for an explicitly requested `--voice moss-marc-filippino` or another `--live` voice: it passes `--live` so the run produces an HLS event-playlist alongside the final MP3. Run it as a background Bash job (`run_in_background: true`, `timeout: 3600000`). Shell variables do not survive between calls, so the output goes to a file:
 
 ```bash
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice moss-marc-filippino --live < /tmp/briefing-script.txt); echo "exit=$?"; echo "$TTS_OUTPUT" > /tmp/briefing-tts-output.txt
@@ -341,7 +341,7 @@ if not os.path.exists(mp3) or os.path.getmtime(mp3) < os.path.getmtime(script):
     sys.exit('FAIL: no fresh MP3 (run died or MP3 is stale)')
 words = len(open(script).read().split())
 dur = float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', mp3]))
-exp = words / 2.6  # MOSS: 2,084 words -> 792 s (2026-10-01); recalibrate for other engines
+exp = words / 2.75  # GPT-Live Sol (default): 2,275 words -> 775 s (2026-10-27); MOSS runs at words / 2.6 (2,084 words -> 792 s, 2026-10-01)
 print(f'words={words} duration={dur:.0f}s expected~{exp:.0f}s')
 sys.exit(0 if 0.8 * exp <= dur <= 1.25 * exp else 'FAIL: duration outside 80-125% of expected')
 EOF
@@ -351,7 +351,7 @@ If it fails, do not publish: rerun `podcast-tts`. The band catches a killed or b
 
 The `--live` flag writes `index.m3u8` + fmp4 segments into `/Users/Shared/projects/static/podcast/live/briefing-episode/` as each TTS chunk is produced, so the link from step 2 starts streaming as soon as the first ~4s of audio is encoded. The final MP3 is still produced normally at `/tmp/briefing-episode.mp3` and gets published to the RSS feed in step 4 as before. After generation completes, the same live URL becomes a finished VOD that plays end-to-end.
 
-Pass through the `--voice` flag from the user's args. Default is `moss-marc-filippino` if not specified. ElevenReader is not a TTS voice for briefings any more: when the user asks for it, use ElevenReader Mode below instead. The `claude-*` presets (buttery/airy/mellow/glassy/rounded) are Anthropic claude.ai TTS via OAuth: cloud, `--live` capable, no per-use cost observed so far (metering unestablished; podcast-tts logs usage per synthesis).
+Pass through the `--voice` flag from the user's args. Default is `gpt-live-web-sol` if not specified, with `gpt-live-codex-sol` as the automatic fallback (see **GPT-Live voices**); an explicit `--voice` is always honoured and never silently replaced. ElevenReader is not a TTS voice for briefings any more: when the user asks for it, use ElevenReader Mode below instead. The `claude-*` presets (buttery/airy/mellow/glassy/rounded) are Anthropic claude.ai TTS via OAuth: cloud, `--live` capable, no per-use cost observed so far (metering unestablished; podcast-tts logs usage per synthesis).
 
 **Fish Audio cloud voices** (`--engine fish-cloud`, `fishcloud-*` presets, or `--voice economist-jason-palmer` etc.): Fish Audio S2.1 sends the entire script in one HTTP request and returns the complete audio when the server finishes — typically 2-3 minutes. Because it is a single-request engine:
 - Skip step 2 — fish-cloud does not support `--live`, so there is no stream URL to announce.
@@ -362,18 +362,20 @@ Pass through the `--voice` flag from the user's args. Default is `moss-marc-fili
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --engine fish-cloud --voice economist-jason-palmer < /tmp/briefing-script.txt)
 ```
 
-**GPT-Live voices** (`--voice gpt-live-web-sol`, ChatGPT web voice allowance; `--voice gpt-live-codex-sol`, Codex allowance). Sol reads the script expressively and may change a word or add a short preamble, so the recording needs checking before it is published. Rules:
+**GPT-Live voices** (`--voice gpt-live-web-sol`, ChatGPT web voice allowance; `--voice gpt-live-codex-sol`, Codex allowance). **These are the default**: when the user passes no `--voice`, use `gpt-live-web-sol`. Sol reads the script expressively and may change a word or add a short preamble, so the recording needs checking before it is published. Rules:
+- **Fallback to Codex.** If the web route is not available, rerun the same script with `--voice gpt-live-codex-sol` (same command, same checks, no live stream). "Not available" means the web run cannot start (ChatGPT logged out, Chrome or CDP 9224 unreachable, voice allowance or session limit exhausted) or still fails after the one retry described under **Check the metadata**. Delete any leftover ChatGPT chat first, say in the notification which route produced the episode and why, and quote that route's cost line. If the Codex route fails too, report where each broke and ask before using another voice. Only an explicit `--voice` from the user overrides this order.
 - **No live stream.** Skip step 2 and do NOT pass `--live`: the recording needs post-processing, so a live stream would carry the uncut audio. Run in the background (`timeout: 3600000`) without it:
 
 ```bash
 TTS_OUTPUT=$(podcast-tts /tmp/briefing-episode.mp3 --voice gpt-live-web-sol < /tmp/briefing-script.txt); echo "exit=$?"; echo "$TTS_OUTPUT" > /tmp/briefing-tts-output.txt
 ```
 
-- **Keep Chrome free during a web run.** The web route drives the shared Chrome on CDP 9224. Do not run `scrape-remote`, `agent-browser` or other browser tasks until it finishes. Finish all scraping first.
-- **Check the metadata.** `/tmp/briefing-episode.mp3.gpt-live.json` must show `completed: true`, `chatDeleted: true` (web route) and per-chunk capture times that match (`wallSeconds` against `audioSeconds`). A failed web run leaves its temporary ChatGPT chat and tab open: delete the chat before retrying, retry once, and if it fails again report where it broke and ask before switching route. It died once after chunk 1 on 2026-10-21 (`__podcastVoice is not defined`) and the retry completed.
-- **Check the audio.** Transcribe the MP3 with two recognisers, Groq (`groq-transcribe`) and local Parakeet (`/v1/audio/transcriptions`, model `parakeet-tdt-0.6b-v3`, `word_timestamps=true`), because each drops words the other hears (on 2026-10-21 Groq lost "ten million" and "That", Parakeet truncated clip tails). Look for leftover Sol preambles at chunk openings ("I'll give it a clear, thoughtful reading"; the automatic trimmer only cuts when it finds the script's first eight words, so openings with names it mishears are left in), misread names and numbers (Sol said "Vladimir Zelensky" for Volodymyr), and the closing sentence. The Parakeet clip text is the evidence for a name or number, not Groq's.
-- **Edit the original recording, never the finished MP3.** `podcast-tts` keeps the lossless chunk recordings in `/tmp/briefing-episode.mp3.raw/`. `gpt_live_assemble.py /tmp/briefing-episode.mp3.raw --list` shows each chunk and where it sits in the episode. Find the fault by transcribing the single `raw-N.wav` and checking its silences, write the spans to remove into `/tmp/briefing-edits.json` (seconds of that raw chunk, cuts in silence), then rebuild with `/Users/Shared/projects/oss/podcasting/gpt_live_assemble.py /tmp/briefing-episode.mp3.raw /tmp/briefing-episode.mp3 --edits /tmp/briefing-edits.json`. Every cut runs on the float recordings before the one MP3 encode. Repeat the audio check on the rebuilt MP3, and say in the notification what you cut or changed. Format and details: `/Users/Shared/projects/oss/podcasting/GPT-LIVE.md`.
-- **Duration check.** The `words / 2.6` calibration is for MOSS. Sol's pauses give about 2.8 words per second (2,033 words became 718 s on 2026-10-21). Use the transcript check above as the completeness test.
+- **Finish your own scraping first.** The web route drives the shared Chrome on CDP 9224, and other agents (Claudio wakes every 45 minutes and uses the browser) cannot be kept off it. The recorder re-selects its own tab before every command and retries when a call lands in another tab, so ordinary use by others is survived (fixed 2026-10-22; before that, any tab activity sent its polls to the wrong tab and the run died with `__podcastVoice is not defined`). Do not add your own browser work during a run. If it still fails with "reloaded or closed", the tab really was reloaded or closed: retry once.
+- **Check the metadata.** `/tmp/briefing-episode.mp3.gpt-live.json` must show `completed: true`, `chatDeleted: true` (web route) and per-chunk capture times that match (`wallSeconds` against `audioSeconds`). A failed web run leaves its temporary ChatGPT chat and tab open: delete the chat before retrying, retry once, and if it fails again switch to the Codex fallback above. It died once after chunk 1 on 2026-10-21 (`__podcastVoice is not defined`) and the retry completed.
+- **Check the audio, for faults only.** Cosimo trusts his ear over the recognisers and small natural phrasing changes from Sol are acceptable, so do not run several recognisers or chase word-level differences. Run `gpt_live_assemble.py /tmp/briefing-episode.mp3.raw --list` and compare each chunk's raw length with its text at about 2.75 words per second: a chunk far too short is a truncated section. On 2026-10-22 the Meta section stopped after 10.8 s of about 150 s, and the run still exited 0 with `completed: true`. Then read the Groq transcript of the MP3 (the one step 4 makes for the .srt; run `groq-transcribe` early and reuse it) for exactly three things: a leftover Sol lead-in at a chunk opening ("Let me shape that so it lands cleanly", "I'll take it slowly and let those beats land"; the automatic trimmer cuts only when it finds the script's first eight words), a missing section, and the closing sentence. A misread name or number is worth a fix, but only when it changes the meaning.
+- **Fix a truncated section by re-recording it alone.** Write that section's paragraphs to a file, run `podcast-tts /tmp/briefing-section.mp3 --voice gpt-live-web-sol < file` (about 3 minutes), copy its `raw-0.wav` over `/tmp/briefing-episode.mp3.raw/raw-N.wav`, set that chunk's `rawSeconds` and `introCut` in `manifest.json` from the new run's manifest, and rebuild with `gpt_live_assemble.py` as below. The other chunks are untouched.
+- **Edit the original recording, never the finished MP3.** `podcast-tts` keeps the lossless chunk recordings in `/tmp/briefing-episode.mp3.raw/`. To cut a lead-in, transcribe only the first 30 s of that `raw-N.wav` with Parakeet word timestamps (`/v1/audio/transcriptions`, model `parakeet-tdt-0.6b-v3`, `word_timestamps=true`) and set `introCut` to 0.18 s before the first real word. Write the spans into `/tmp/briefing-edits.json` (seconds of that raw chunk, cuts in silence, e.g. `{"3": {"introCut": 5.90}}`), then rebuild with `/Users/Shared/projects/oss/podcasting/gpt_live_assemble.py /tmp/briefing-episode.mp3.raw /tmp/briefing-episode.mp3 --edits /tmp/briefing-edits.json`. Every cut runs on the float recordings before the one MP3 encode. Say in the notification what you cut or changed. Format and details: `/Users/Shared/projects/oss/podcasting/GPT-LIVE.md`.
+- **Duration check.** The `words / 2.6` calibration is for MOSS. Sol runs at about 2.75 words per second (2,137 words became 776 s on 2026-10-22; 2,033 became 718 s on 2026-10-21). The per-chunk length comparison above is the completeness test.
 - **Cost line.** The web route prints the remaining voice allowance in `COST:`, not a dollar figure. Quote that in the notification. The Codex route prints an estimate.
 
 **Waiting for TTS to complete:** Chunked engines (moss, kokoro, gemini, claude, etc.) typically take 10-17 minutes and support `--live`: run them as a background job (`run_in_background: true`, `timeout: 3600000`) and resume from the completion notification. Single-request engines (fish-cloud) complete in 2-5 minutes: run them in the foreground with a 600000ms timeout. The foreground cap is 600000 ms whatever `timeout` is requested. History: a background run died mid-job on 2026-05-31 for a cause nobody found (the agent invented one), and the rule was set to "always foreground" on 2026-08-12. That rule only worked because the harness moves a long foreground call to the background after 10 minutes. A 13m12s background run completed cleanly on 2026-10-01, and the MP3 check in step 3 covers the old failure.
@@ -499,7 +501,7 @@ rm -rf /tmp/briefing-episode.mp3.raw   # GPT-Live voices only: the lossless chun
 
 7. **Notify the user — mandatory, every run**: Output plain text (do NOT use `speak` — it wastes TTS credits on a text notification; do NOT use `send_message_to_workspace` — it targets a different workspace, not the current chat). **Always include a push page: tag `@Cosimo` or call `notify_user`. This is never optional, even when the session looks interactive — Cosimo regularly steps away for the half hour a briefing takes, and the page is the only thing that tells him it finished. Do not reason that he is watching the chat; he isn't.** Include the episode title, a one-line summary of the three articles, and the TTS cost (the `COST:` line step 6 printed, e.g. "TTS cost: $0.12"). The user will see the episode in Apple Podcasts automatically — and the live URL from step 2 keeps working as a finished VOD until three newer episodes push it out (the 3-most-recent prune is built into `podcast-tts`).
 
-**Voice presets**: Default is `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio). Pass `--voice` from the user's args through to `podcast-tts`. `claude-*` presets are Anthropic claude.ai TTS (cloud, `--live` capable). For ElevenReader see ElevenReader Mode.
+**Voice presets**: Default is `gpt-live-web-sol` (ChatGPT web voice), falling back to `gpt-live-codex-sol` when the web route is not available; `moss-marc-filippino` (MOSS-TTS clone, free local Mac Studio) remains available on request. Pass `--voice` from the user's args through to `podcast-tts`. `claude-*` presets are Anthropic claude.ai TTS (cloud, `--live` capable). For ElevenReader see ElevenReader Mode.
 
 #### WhatsApp Mode (--whatsapp)
 
@@ -536,7 +538,7 @@ echo "Transcript available at: https://cosimos-mac-studio.tail2af01f.ts.net/arti
 
 #### ElevenReader Mode (--elevenreader)
 
-When the user asks for ElevenReader (MOSS remains the default for every other run), the briefing goes into their ElevenReader library as text and nowhere else. They listen in ElevenReader's own web or mobile reader and choose the voice and expressiveness there. Do NOT render audio, do NOT download audio from ElevenReader, and do NOT publish to the podcast feed or Spotify. Podcast Mode's steps 2, 3 and 5 (live URL, TTS, Spotify) and the feed publication in step 4 do not apply.
+When the user asks for ElevenReader (the GPT-Live default applies to every other run), the briefing goes into their ElevenReader library as text and nowhere else. They listen in ElevenReader's own web or mobile reader and choose the voice and expressiveness there. Do NOT render audio, do NOT download audio from ElevenReader, and do NOT publish to the podcast feed or Spotify. Podcast Mode's steps 2, 3 and 5 (live URL, TTS, Spotify) and the feed publication in step 4 do not apply.
 
 Steps 0 to 5.5 run as usual, including the sub-edit and the fact-check, and step 4.5 still records the selection. Then:
 
@@ -576,7 +578,7 @@ When feedback is received, update `references/preferences.md` immediately:
 - Use `--whatsapp` for immediate voice message delivery (e.g. when user wants it NOW)
 - Use `--text-only` to skip TTS entirely (fastest, no cost)
 - Use `--elevenreader` to put the text in the ElevenReader library and nothing else (no audio, no feed, no Spotify)
-- The `--voice` flag controls TTS: `chris-brift` (ElevenLabs, default), `archer` (younger editorial), `adam-stone` (deeper), or `aoede` (Gemini, free)
+- The `--voice` flag controls TTS: `gpt-live-web-sol` (default, falls back to `gpt-live-codex-sol`), `chris-brift` (ElevenLabs), `archer` (younger editorial), `adam-stone` (deeper), or `aoede` (Gemini, free)
 
 **Article selection:**
 - Scan ALL headlines before deciding - don't just pick the first 3 interesting ones
@@ -597,7 +599,8 @@ When feedback is received, update `references/preferences.md` immediately:
 **Voice delivery (podcast/whatsapp modes):**
 - `--voice drama3-marc-filippino`: local Fish Audio Drama 3 4-bit with Marc's clone. Other `drama3-<preset>` voices include `gemma`, `gina`, and `jason-palmer`.
 - `--voice ming-uk-george`: local Ming-3.0-tts 0.5B built-in British voice; also `ming-uk-charlotte` and `ming-<clone preset>` such as `ming-marc-filippino`. Write numbers as words.
-- `--voice moss-marc-filippino` (default): MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio).
+- `--voice gpt-live-web-sol` (default): ChatGPT web voice, Sol. Falls back to `--voice gpt-live-codex-sol` (Codex allowance) when the web route is not available.
+- `--voice moss-marc-filippino`: MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio).
 - `--voice claude-buttery` (or claude-airy/mellow/glassy/rounded): Anthropic claude.ai TTS via OAuth (cloud, `--live` capable, 16 kHz source — narrower-band than local engines; multilingual with no extra flags).
 - `--voice aoede`: Gemini Flash, female British newsreader, cheap
 - `--voice aoede-pro`: Gemini Pro, female British newsreader, 2x cost, richer expressivity
