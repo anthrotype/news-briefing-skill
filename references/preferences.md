@@ -51,6 +51,9 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ## Feedback History
 
+### 2026-10-26
+- **Voice**: Cosimo asked for ChatGPT web (`--voice gpt-live-web-sol`) for this run.
+
 ### 2026-07-11
 - **Headline mention versus deep dive**: A topic or company briefly mentioned in one day's headlines remains eligible for a deep dive the next day when there is a genuinely new, substantive development. Do not treat a headline mention as seven-day topic coverage; apply the repetition rule to prior deep dives or repeated substantive treatment instead.
 
