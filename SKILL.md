@@ -263,16 +263,26 @@ If you cannot trace a specific claim directly back to a headline URL in the fetc
 - **Tone cues**: use `[chuckling]` at the start of a sentence for dry/wry moments; use `[confident]` for declarative assertions the presenter owns. The canonical S2 forms are `[whispering]` and `[chuckling]`; empirically `[chuckle]` also works; `[excited]` is flaky. These emotion and tone tags do work — it is only the pause markers that are inert.
 - Do NOT insert these tags for other engines. On MOSS they are not read aloud literally, but they misbehave: inline within a sentence they become pauses or odd vocalizations ("[chuckling]" produced a sigh), and isolated on their own line — exactly where the section-break conversion puts them — MOSS hallucinates speech-like noises (observed on the Aug 1 episode re-run). On other engines assume they are read aloud.
 
-**Drama 3 speech tags (`--voice drama3-marc-filippino`).** This local engine uses the same clone presets as MOSS. Keep ordinary news narration untagged. For an intentional delivery change, put `[laughs]`, `[sighs]`, or `[whispers]` immediately before the relevant text. These are generation cues, not exact timing controls. Do not carry MOSS `[pause X.Ys]` or Fish S2 pause tags into a Drama 3 script. Use `---` for section breaks; `podcast-tts` inserts real silence. Speaker tags `<|speaker:0|>` through `<|speaker:15|>` select speakers, but this wrapper supplies only one clone reference per request. Use separate renders when each speaker needs a distinct reference. [Upstream tag and streaming guide](https://blaizzy.github.io/mlx-audio/models/tts/fish-drama3.html).
+**Drama 3 directions (`--voice drama3-marc-filippino`, other `drama3-<preset>`).** This local engine uses the same clone presets as MOSS, but unlike MOSS it performs a neutral reading unless directed, so a Drama 3 script carries stage directions. All of them are plain text in the script:
+
+- **Register per section.** Open each section with one bracketed brief, written like a note to a newsreader: `[measured, warm, unhurried]` for the opening and headlines, `[wry, lighter]` for a light item, `[sombre, slower]` for a death or disaster, `[brisk]` for the roundup. The brief goes immediately before the first sentence it governs. Add at most one more inside a section where the mood genuinely turns.
+- **Sounds, rarely.** `[small laugh]` at a dry aside, `[breath]` or `[short pause]` before the editorial pivot, `[sighs]` only where a human presenter would. A handful per episode, not per paragraph.
+- **Paired tags on specific words.** `<emphasis>` on the one number or word that carries a sentence, `<slow>` on the pivot sentence, `<soft>` for an aside. `<whisper>`, `<fast>`, `<stress>` and `<forceful>` exist but have no place in a news read. Keep each pair inside one sentence (the model chunks long text at sentence ends).
+- **Everything else is plain broadcast prose.** No MOSS `[pause X.Ys]`, no Fish `[break]`/`[chuckling]` tags. Use `---` for section breaks; `podcast-tts` inserts real silence. Leave a space after every closing bracket (a `[tag](text)` shape is stripped as a markdown link).
+- Example: `[wry, lighter] Intel's shares fell <emphasis>twenty-two per cent</emphasis> after hours. [small laugh] Component shortages, again.`
+- Heard locally on 2026-10-30: a direction, `[sighs]`, `<whisper>`, `<slow>` and `<emphasis>` in one take all landed and none were spoken as words. `<soft>`, `<fast>`, `<stress>`, `<forceful>`, language tags (`<french>…</french>`) and phoneme tags are documented by Fish for the hosted model and untested on the local 4-bit weights.
+- Speaker tags `<|speaker:0|>` through `<|speaker:15|>` select speakers, but this wrapper supplies only one clone reference per request. Use separate renders when each speaker needs a distinct reference. References: [Fish's Drama 3 direction guide](https://docs.fish.audio/features/text-to-speech/drama-3), [mlx-audio Drama 3 guide](https://blaizzy.github.io/mlx-audio/models/tts/fish-drama3/).
 
 **Ming (`--voice ming-uk-george`, `ming-marc-filippino`, other `ming-<preset>`).** Local Ant Group Ming-3.0-tts 0.5B, faster than real time. It has no text normalisation, so a Ming script must write every number, date, currency amount and percentage out in words ("three point two per cent", not "3.2%"); abbreviations that should be expanded need the same treatment. Keep narration untagged; Ming's inline tags are capitalised (`[Sigh]`, `[Laughter]`), and the MOSS, Fish S2 and Drama 3 tags do not apply. Use `---` for section breaks.
+
+**Audio8 (`--voice audio8-default`, `audio8-marc-filippino`, other `audio8-<preset>`).** Local Edge0 Audio8-TTS-Realistic 0.6B, about twice real time. Clones use the short references. Keep narration untagged: it has no tags and no instructions. Write numbers as words, as for Ming. Use `---` for section breaks.
 
 **MOSS pause markers (moss/moss-lt engines).** MOSS-TTS v1.5's only documented bracket markup is an explicit-duration pause: `[pause 1.5s]`, `[pause 3s]` (model card: `[pause X.Ys]`). Verified locally through podcast-tts: durations are honored (3s requested → ~2.9s measured) and nothing is spoken. Usage:
 
 - Section breaks stay `---`. MOSS never sees the separator — podcast-tts strips it at chunking and splices silence in at concatenation (1.75s at `---`, 0.7s at paragraph breaks, per `MOSS_GAPS`). Do not use `[long-break]`/`[break]` with MOSS.
 - `[pause X.Ys]` may be used sparingly for intra-section dramatic beats (e.g. the editorial pivot, or after a punchy standalone sentence), **inline only** — keep it inside a paragraph's text, never alone on its own line (a bracket tag standing alone risks the same hallucination as Fish tags there; inferred from the [break] behavior, not separately tested).
 - MOSS v1.5 has no documented emotion or sound-event tags ([laugh]/[music] belong to MOSS-TTSD, the separate dialogue model). Don't use them.
-- When converting a script between engines: both fish-cloud and MOSS now use `---` for section breaks, so conversion is only about the inline tags — strip Fish's `[chuckling]`/`[emphasis]`/emotion tags going to MOSS, and drop MOSS's inline `[pause X.Ys]` going to Fish (Fish ignores it).
+- When converting a script between engines: both fish-cloud and MOSS now use `---` for section breaks, so conversion is only about the inline tags — strip Fish's `[chuckling]`/`[emphasis]`/emotion tags going to MOSS, and drop MOSS's inline `[pause X.Ys]` going to Fish (Fish ignores it). Going from Drama 3 to any other engine, strip every bracketed direction and every paired `<tag>…</tag>` (other engines read them aloud or misbehave); going to Drama 3, drop the MOSS pauses and Fish tags and add directions per the Drama 3 block above.
 
 (Operational note: fish-cloud runs on a free API promotion expected to end late August 2026 and may be retired after that — MOSS is the safe long-term target among the local voices.)
 
@@ -339,7 +349,9 @@ import os, subprocess, sys
 mp3, script = '/tmp/briefing-episode.mp3', '/tmp/briefing-script.txt'
 if not os.path.exists(mp3) or os.path.getmtime(mp3) < os.path.getmtime(script):
     sys.exit('FAIL: no fresh MP3 (run died or MP3 is stale)')
-words = len(open(script).read().split())
+import re
+text = re.sub(r'\[[^\]\n]*\]|</?(?:whisper|emphasis|soft|fast|slow|stress|forceful)>', '', open(script).read())  # Drama 3 directions are not spoken
+words = len(text.split())
 dur = float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', mp3]))
 exp = words / 2.75  # GPT-Live Sol (default): 2,275 words -> 775 s (2026-10-27); MOSS runs at words / 2.6 (2,084 words -> 792 s, 2026-10-01)
 print(f'words={words} duration={dur:.0f}s expected~{exp:.0f}s')
@@ -412,7 +424,8 @@ DESCRIPTION="AI-curated daily news briefing: [brief summary of the 3 articles co
 ARTICLES_DIR="/Users/Shared/projects/static/articles"
 mkdir -p "$ARTICLES_DIR"
 SLUG="news-briefing-$(TZ=Europe/London date +%Y-%m-%d)$([ -n "$SUFFIX" ] && TZ=Europe/London date +-%H%M)"
-cp /tmp/briefing-script.txt "$ARTICLES_DIR/${SLUG}.md"
+# Stage directions (Drama 3 brackets and paired tags) are not spoken, so keep them out of the published transcript
+sed -E 's/\[[^]]*\] ?//g; s#</?(whisper|emphasis|soft|fast|slow|stress|forceful)>##g' /tmp/briefing-script.txt > "$ARTICLES_DIR/${SLUG}.md"
 chmod 644 "$ARTICLES_DIR/${SLUG}.md"
 TRANSCRIPT_URL="https://cosimos-mac-studio.tail2af01f.ts.net/articles/${SLUG}.md"
 
@@ -599,6 +612,7 @@ When feedback is received, update `references/preferences.md` immediately:
 **Voice delivery (podcast/whatsapp modes):**
 - `--voice drama3-marc-filippino`: local Fish Audio Drama 3 4-bit with Marc's clone. Other `drama3-<preset>` voices include `gemma`, `gina`, and `jason-palmer`.
 - `--voice ming-uk-george`: local Ming-3.0-tts 0.5B built-in British voice; also `ming-uk-charlotte` and `ming-<clone preset>` such as `ming-marc-filippino`. Write numbers as words.
+- `--voice audio8-default`: local Audio8-TTS-Realistic 0.6B own voice; also `audio8-<clone preset>` such as `audio8-marc-filippino`. Write numbers as words.
 - `--voice gpt-live-web-sol` (default): ChatGPT web voice, Sol. Falls back to `--voice gpt-live-codex-sol` (Codex allowance) when the web route is not available.
 - `--voice moss-marc-filippino`: MOSS-TTS cloned Marc Filippino voice (free, local Mac Studio).
 - `--voice claude-buttery` (or claude-airy/mellow/glassy/rounded): Anthropic claude.ai TTS via OAuth (cloud, `--live` capable, 16 kHz source — narrower-band than local engines; multilingual with no extra flags).
