@@ -24,7 +24,7 @@ Invoke this skill from the current harness (`/news-briefing` in Claude Code slas
 - **Voice choice**: `--voice claude-buttery` (also claude-airy/mellow/glassy/rounded) - Anthropic claude.ai TTS via OAuth (cloud; 16 kHz source so narrower-band than the local 24-48 kHz engines; metering unestablished — usage is logged per synthesis; supports --live)
 - **WhatsApp mode**: `--whatsapp` - Sends as WhatsApp voice message (legacy behavior)
 - **Text-only mode**: `--text-only` - Saves transcript to file and sends file link (no TTS cost)
-- **ElevenReader mode**: `--elevenreader`, or whenever the user asks for ElevenReader - uploads the script to the user's ElevenReader library as text and does nothing else: no TTS here, no audio download, no podcast feed, no Spotify. The user listens in ElevenReader's own web or mobile reader and picks the voice and expressiveness there. MOSS stays the default for every other run.
+- **ElevenReader mode**: `--elevenreader`, or whenever the user asks for ElevenReader - uploads the script to the user's ElevenReader library as text and does nothing else: no TTS here, no audio download, no podcast feed, no Spotify. The user listens in ElevenReader's own web or mobile reader. The voice is Penny Sol (the user's standing choice since 2026-10-31); the upload helper sets it as the account's default voice before uploading, so nothing needs choosing. MOSS stays the default for every other run.
 
 ## Workflow
 
@@ -538,7 +538,7 @@ echo "Transcript available at: https://cosimos-mac-studio.tail2af01f.ts.net/arti
 
 #### ElevenReader Mode (--elevenreader)
 
-When the user asks for ElevenReader (the GPT-Live default applies to every other run), the briefing goes into their ElevenReader library as text and nowhere else. They listen in ElevenReader's own web or mobile reader and choose the voice and expressiveness there. Do NOT render audio, do NOT download audio from ElevenReader, and do NOT publish to the podcast feed or Spotify. Podcast Mode's steps 2, 3 and 5 (live URL, TTS, Spotify) and the feed publication in step 4 do not apply.
+When the user asks for ElevenReader (the GPT-Live default applies to every other run), the briefing goes into their ElevenReader library as text and nowhere else. They listen in ElevenReader's own web or mobile reader with the Penny Sol voice (the helper in step 2 enforces it). Do NOT render audio, do NOT download audio from ElevenReader, and do NOT publish to the podcast feed or Spotify. Podcast Mode's steps 2, 3 and 5 (live URL, TTS, Spotify) and the feed publication in step 4 do not apply.
 
 Steps 0 to 5.5 run as usual, including the sub-edit and the fact-check, and step 4.5 still records the selection. Then:
 
@@ -551,7 +551,7 @@ uv run --project /Users/Shared/projects/oss/mcp-elevenreader \
   python scripts/upload-to-elevenreader.py /tmp/briefing-script.txt "$TITLE"
 ```
 
-It prints `read_id=`, `title=` and `words=`. Check that the title is the one you passed and that the word count is within a few words of the script's.
+It first makes sure the account's default voice is Penny Sol, then prints `voice=` (or `voice set to penny-sol`), `read_id=`, `title=` and `words=`. Check that the title is the one you passed and that the word count is within a few words of the script's.
 3. Record the day with `scripts/update-recent-summaries.js`, exactly as in Podcast Mode step 4, so tomorrow's briefing does not repeat today's stories.
 4. Clean up: `rm -f /tmp/briefing-script.txt /tmp/article1.md /tmp/article2.md /tmp/article3.md /tmp/briefing-selection.env /tmp/briefing-selection.json /tmp/headline-*.md`.
 5. Notify with a push page (tag `@Cosimo` or call `notify_user`): the title, a one-line summary of the three articles, and that it is in the ElevenReader library. There is no TTS cost line.
@@ -641,7 +641,7 @@ TypeScript script that connects to remote Chrome via CDP (port 9224, Mac Studio 
 `node scripts/select-articles.js E2 F1 V3` — resolves three article ids against `references/last-headlines.json`, rejects ids already in the 7-day history (`--force` to override), writes `/tmp/briefing-selection.env` and `/tmp/briefing-selection.json`, and scrapes each article to `/tmp/articleN.md` with `scrape-remote` (`--no-scrape` to only write the selection). Exit 0 all scraped, 2 some scrape failed (fallback commands printed), 1 bad input. Exists so that no URL is ever retyped by the model.
 
 ### scripts/upload-to-elevenreader.py
-`uv run --project /Users/Shared/projects/oss/mcp-elevenreader python scripts/upload-to-elevenreader.py <script.txt> "<title>"` — uploads the briefing text to the ElevenReader library with the title as a heading and prints `read_id=`, `title=`, `words=`. No TTS, no audio download. Used by ElevenReader Mode.
+`uv run --project /Users/Shared/projects/oss/mcp-elevenreader python scripts/upload-to-elevenreader.py <script.txt> "<title>"` — uploads the briefing text to the ElevenReader library with the title as a heading and prints `voice=`, `read_id=`, `title=`, `words=`. It sets the account's default ElevenReader voice to Penny Sol first. No TTS, no audio download. Used by ElevenReader Mode.
 
 ### scripts/update-article-history.js
 No arguments: records the three articles from `/tmp/briefing-selection.json` in `article-history.json` with today's date and prunes entries older than 7 days.
