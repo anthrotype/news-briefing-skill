@@ -24,7 +24,7 @@ Invoke this skill from the current harness (`/news-briefing` in Claude Code slas
 - **Voice choice**: `--voice claude-buttery` (also claude-airy/mellow/glassy/rounded) - Anthropic claude.ai TTS via OAuth (cloud; 16 kHz source so narrower-band than the local 24-48 kHz engines; metering unestablished — usage is logged per synthesis; supports --live)
 - **WhatsApp mode**: `--whatsapp` - Sends as WhatsApp voice message (legacy behavior)
 - **Text-only mode**: `--text-only` - Saves transcript to file and sends file link (no TTS cost)
-- **ElevenReader mode**: `--elevenreader`, or whenever the user asks for ElevenReader - uploads the script to the user's ElevenReader library as text and does nothing else: no TTS here, no audio download, no podcast feed, no Spotify. The user listens in ElevenReader's own web or mobile reader. The voice is Penny Sol (the user's standing choice since 2026-10-31); the upload helper sets it as the account's default voice before uploading, so nothing needs choosing. MOSS stays the default for every other run.
+- **ElevenReader mode**: `--elevenreader`, or whenever the user asks for ElevenReader - uploads the script to the user's ElevenReader library as text and does nothing else: no TTS here, no audio download, no podcast feed, no Spotify. The user listens in ElevenReader's own web or mobile reader. The voice is Penny Sol (the user's standing choice since 2026-10-31); the upload helper sets it as the account's default voice before uploading, so nothing needs choosing. Use it only when the user asks for ElevenReader; every other run keeps the default voice, `gpt-live-web-sol`.
 
 ## Workflow
 

@@ -51,6 +51,9 @@ This file tracks learned preferences from user feedback to improve article selec
 
 ## Feedback History
 
+### 2026-10-31
+- **Voice defaults**: a regular briefing uses the ChatGPT web voice (`gpt-live-web-sol`, Codex fallback) unless Cosimo asks for ElevenReader. ElevenReader is text-only, with the Penny Sol voice (the upload helper sets it), and only on request.
+
 ### 2026-10-26
 - **Voice**: Cosimo asked for ChatGPT web (`--voice gpt-live-web-sol`) for this run.
 
